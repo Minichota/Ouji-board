@@ -1,32 +1,37 @@
 PROGRAM_NAME=ouji_board
 SRC_DIR=src
-CC=g++
-CXX_FLAGS=-I$(SRC_DIR) `sdl2-config --libs --cflags` -ggdb3 -O0 -Wall -lSDL2_image -lm
-FILES=main
-H_FILES=$(FILES).h
-SRC_FILES=$(FILES).cpp
-OBJ_FILES=main.o
 O_DIR=obj
+CXX=g++
+cpp_dirs=errors math terminal
+external_files=$(SRC_DIR)/terminal/SDL_FontCache.o
+SRC=src
 
-DEPS = $(patsubst %,$(SRC_DIR)/%,$(H_FILES))
-SRCS = $(patsubst %,$(SRC_DIR)/%,$(SRC_FILES))
-OBJECTS = $(patsubst %,$(O_DIR)/%,$(OBJ_FILES))
+SRC_FILES= $(wildcard $(SRC)/*.cpp $(addsuffix /*.cpp,$(addprefix $(SRC)/,$(cpp_dirs))))
+H_FILES=$(SRC_DIR) $(addprefix $(SRC_DIR)/,$(cpp_dirs))
+OBJ_FILES=$(patsubst $(SRC)/%.o,$(O_DIR)/%.o, $(SRC_FILES:.cpp=.o))
+
+VPATH=$(SRC_DIR) $(addprefix $(SRC)/,$(cppdirs))
+
+CXX_FLAGS=$(addprefix -I, $(H_FILES)) `sdl2-config --libs --cflags` -ggdb3 -O3 -Wall -lSDL2_image -lm -std=c++17 -lSDL2_ttf
 
 all: $(O_DIR)/$(PROGRAM_NAME) | run
 
 compile: $(O_DIR)/$(PROGRAM_NAME)
 
-$(O_DIR):
+$(O_DIR)/$(PROGRAM_NAME): $(OBJ_FILES) | copy_objects
+	$(CXX) -o $@ $^ $(CXX_FLAGS) $(external_files)
+
+$(O_DIR)/%.o: %.cpp | $(addprefix $(O_DIR)/,$(cpp_dirs))
+	$(CXX) -c -o $@ $< $(CXX_FLAGS)
+
+
+$(addprefix $(O_DIR)/,$(cpp_dirs)):
 	mkdir -p $@
-$(O_DIR)/%.o: $(SRCS) $(DEPS) | $(O_DIR)
-	$(CC) -c -o $@ $< $(CXX_FLAGS)
 
-$(O_DIR)/$(PROGRAM_NAME): $(OBJECTS)
-	$(CC) -o $@ $^ $(CXX_FLAGS)
-
-
-	
 .PHONY: clean run
+copy_objects:
+	cp -u $(external_files) $(patsubst $(SRC_DIR)/%.o, $(O_DIR)/%.o, $(external_files))
+
 clean:
 	rm -rf $(O_DIR)
 
