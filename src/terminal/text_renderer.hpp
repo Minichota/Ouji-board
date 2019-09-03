@@ -11,6 +11,7 @@ class Text_Renderer : public Renderable, public Sizeable {
 	Text_Renderer(SDL_Renderer* const renderer, int x, int y, short w, short h, const char* font_path);
 	~Text_Renderer();
 
+	void update();
 	void render();
 
 	void push_text(const char* text);
@@ -21,6 +22,7 @@ class Text_Renderer : public Renderable, public Sizeable {
 	bool active = false;
 
 	FC_Font* font;
+	unsigned short font_size;
 
 	// represents the text
 	SDL_Texture* texture;

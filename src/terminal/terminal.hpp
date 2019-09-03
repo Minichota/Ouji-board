@@ -6,7 +6,7 @@
 #include "text_renderer.hpp"
 #include "input_handling.hpp"
 #include "event_handler.hpp"
-class Terminal : Renderable, Sizeable, Event_Handler {
+class Terminal : public Window {
 	public:
 	Terminal(SDL_Renderer* const renderer, int x, int y, unsigned short w, unsigned short h, const char* font_path);
 	~Terminal();

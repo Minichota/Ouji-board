@@ -17,10 +17,11 @@ class Window : Sizeable, Renderable, Event_Handler {
 	void kill();
 
 	void resize(short w, short h);
-	virtual void parse_event(const SDL_Event event) = 0;
+	virtual void handle_event(const SDL_Event event) = 0;
 
 	protected:
 	SDL_Rect border;
 	const SDL_Color border_color;
+	unsigned short border_size;
 };
 #endif

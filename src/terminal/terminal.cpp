@@ -1,7 +1,6 @@
 #include "terminal.hpp"
 Terminal::Terminal(SDL_Renderer* const renderer, int x, int y, unsigned short w, unsigned short h, const char* font_path):
-Renderable(renderer),
-Sizeable(x, y, w, h),
+Window(renderer, x, y, w, h),
 text_renderer(renderer, x, y, w, h, font_path)
 {
 }
@@ -12,6 +11,7 @@ Terminal::~Terminal()
 void Terminal::update()
 {
 	text_renderer.set_text(input_handler.get_buffer().c_str());
+	text_renderer.update();
 }
 
 void Terminal::render()
