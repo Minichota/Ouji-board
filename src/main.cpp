@@ -20,10 +20,12 @@ int main()
 		if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 		{
 			e.push_reason("error initializing SDL: ", SDL_GetError());
+			e.set_error_code(1);
 		}
 		if(TTF_Init() != 0)
 		{
 			e.push_reason("error initializing TTF: ", SDL_GetError());
+			e.set_error_code(1);
 		}
 	}
 

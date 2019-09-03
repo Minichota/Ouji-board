@@ -12,10 +12,12 @@ class Error
 	~Error();
 
 	void push_reason(const char* type, const char* reason);
-	const char* get_error_code();
+	const char* get_error_text();
+	void set_error_code(char code);
 
 	private:
-	char code[256];
+	char error_text[256];
+	char error_code = 0;
 };
 extern std::vector<Error*> errors;
 #endif

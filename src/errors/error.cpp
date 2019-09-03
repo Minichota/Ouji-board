@@ -8,14 +8,14 @@ static void close_window();
 Error::Error()
 {
 	// clearing error garbage values
-	memset(&code[0], '\0', sizeof(code));
+	memset(&error_text[0], '\0', sizeof(error_text));
 }
 Error::~Error()
 {
-	if(!(code[0] == '\0'))
+	if(!(error_text[0] == '\0'))
 	{
 		close_window();
-		exit(1);
+		exit(error_code);
 	}
 }
 
@@ -28,22 +28,27 @@ void Error::push_reason(const char* type, const char* reason)
 	}
 	else
 	{
-		strcat(code, delimiter);
+		strcat(error_text, delimiter);
 	}
-	strcat(code, type);
-	strcat(code, reason);
-
+	strcat(error_text, type);
+	strcat(error_text, reason);
 }
-const char* Error::get_error_code()
+
+void Error::set_error_code(char code)
 {
-	return this->code;
+	this->error_code = code;
+}
+
+const char* Error::get_error_text()
+{
+	return this->error_text;
 }
 
 void close_window()
 {
 	for(size_t i = 0; i < errors.size(); i++)
 	{
-		std::cout << errors[i]->get_error_code() << std::endl;
+		std::cout << errors[i]->get_error_text() << std::endl;
 	}
 	should_close = true;
 }
