@@ -1,3 +1,4 @@
+#include <iostream>
 #include "window.hpp"
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_rect.h"
@@ -8,6 +9,7 @@ Renderable(renderer),
 border_color{255,0,0,255},
 border_size(5)
 {
+	this->border = {pos.x / border_size, pos.y / border_size, size.x / border_size, size.y / border_size};
 }
 
 Window::~Window()
@@ -20,10 +22,11 @@ void Window::update()
 
 void Window::render()
 {
-	SDL_RenderSetScale(renderer, 1, 1);
 	// do other shite
 	SDL_RenderSetScale(renderer, 5, 5);
+	SDL_SetRenderDrawColor(renderer, border_color.r, border_color.g, border_color.b, border_color.a);
 	SDL_RenderDrawRect(renderer, &border);
+	SDL_RenderSetScale(renderer, 1, 1);
 }
 
 void Window::kill()

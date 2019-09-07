@@ -79,7 +79,7 @@ void handle_event(const SDL_Event e)
 		} break;
 		case SDL_KEYDOWN:
 		{
-			std::cout << "pressed key " << SDL_GetKeyName(e.key.keysym.sym) << std::endl;
+			//std::cout << "pressed key " << SDL_GetKeyName(e.key.keysym.sym) << std::endl;
 			switch(e.key.keysym.sym)
 			{
 				case SDLK_ESCAPE:

@@ -24,12 +24,11 @@ Text_Renderer::~Text_Renderer()
 
 void Text_Renderer::update()
 {
-	FC_GetWrappedText(this->font, (char*)this->text.c_str(), 1000, this->size.x, this->text.c_str());
 }
 
 void Text_Renderer::render()
 {
-	FC_Draw(font, renderer, pos.x, pos.y, this->text.c_str());
+	FC_DrawColumn(font, renderer, pos.x, pos.y, size.x, this->text.c_str());
 }
 
 void Text_Renderer::push_text(const char* text)
@@ -40,4 +39,14 @@ void Text_Renderer::push_text(const char* text)
 void Text_Renderer::set_text(const char* text)
 {
 	this->text = text;
+}
+
+std::string Text_Renderer::get_text()
+{
+	return this->text;
+}
+
+FC_Font* Text_Renderer::get_font()
+{
+	return this->font;
 }

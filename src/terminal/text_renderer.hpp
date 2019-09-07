@@ -17,6 +17,9 @@ class Text_Renderer : public Renderable, public Sizeable {
 	void push_text(const char* text);
 	void set_text (const char* text);
 
+	FC_Font* get_font();
+	std::string get_text();
+
 	private:
 	std::string text;
 	bool active = false;

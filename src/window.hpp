@@ -7,16 +7,16 @@
 #include "renderable.hpp"
 #include "event_handler.hpp"
 
-class Window : Sizeable, Renderable, Event_Handler {
+class Window : public Sizeable, public Renderable, Event_Handler {
 	public:
 	Window(SDL_Renderer* const renderer, int x, int y, unsigned short w, unsigned short h);
 	virtual ~Window();
 
 	virtual void update();
 	virtual void render();
-	void kill();
+	virtual void kill();
 
-	void resize(short w, short h);
+	virtual void resize(short w, short h);
 	virtual void handle_event(const SDL_Event event) = 0;
 
 	protected:

@@ -26,7 +26,7 @@ void Input_Handler::handle_event(const SDL_Event event)
 				} break;
 				case SDLK_RETURN:
 				{
-					buffer.append("\n");
+					buffer.push_back('\n');
 				} break;
 			}
 		} break;
