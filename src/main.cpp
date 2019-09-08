@@ -79,14 +79,9 @@ void handle_event(const SDL_Event e)
 		} break;
 		case SDL_KEYDOWN:
 		{
-			//std::cout << "pressed key " << SDL_GetKeyName(e.key.keysym.sym) << std::endl;
-			switch(e.key.keysym.sym)
+			if((e.key.keysym.mod & SDLK_LCTRL) && e.key.keysym.sym == SDLK_c)
 			{
-				case SDLK_ESCAPE:
-				{
-					Error err = Error();
-					err.push_reason(USER_CLOSED, "escape key");
-				} break;
+				std::cout << "hit control+c" << std::endl;
 			}
 		}
 	}

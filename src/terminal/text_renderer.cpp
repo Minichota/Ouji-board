@@ -11,7 +11,7 @@
 Text_Renderer::Text_Renderer(SDL_Renderer* const renderer, int x, int y, short w, short h, const char* font_path) :
 Renderable(renderer),
 Sizeable(x, y, w, h),
-font_size(32)
+font_size(20)
 {
 	font = FC_CreateFont();
 	FC_LoadFont(font, renderer, "data/fonts/test.ttf", font_size, FC_MakeColor(255,255,255,255), TTF_STYLE_NORMAL);

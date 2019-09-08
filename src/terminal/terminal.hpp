@@ -18,6 +18,8 @@ class Terminal : public Window {
 
 	void handle_event(const SDL_Event e);
 
+	void exec_cmd(std::string cmd);
+
 	private:
 	static constexpr SDL_Color cursor_color {255, 255, 255, 255};
 	SDL_Rect cursor_pos;

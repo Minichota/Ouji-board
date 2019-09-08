@@ -5,7 +5,8 @@ Input_Handler::Input_Handler()
 }
 Input_Handler::~Input_Handler()
 {
-	buffer.clear();
+	text_buffer.clear();
+	cmd_buffer.clear();
 }
 void Input_Handler::handle_event(const SDL_Event event)
 {
@@ -13,7 +14,8 @@ void Input_Handler::handle_event(const SDL_Event event)
 	{
 		case SDL_TEXTINPUT:
 		{
-			buffer.append(event.text.text);
+			text_buffer.append(event.text.text);
+			cmd_buffer.append(event.text.text);
 		} break;
 		case SDL_KEYDOWN:
 		{
@@ -21,18 +23,35 @@ void Input_Handler::handle_event(const SDL_Event event)
 			{
 				case SDLK_BACKSPACE:
 				{
-					if(buffer.size() > 0)
-						buffer.pop_back();
+					if(cmd_buffer.size() > 0)
+					{
+						text_buffer.pop_back();
+						cmd_buffer.pop_back();
+					}
 				} break;
 				case SDLK_RETURN:
 				{
-					buffer.push_back('\n');
+					text_buffer.push_back('\n');
 				} break;
 			}
 		} break;
 	}
 }
-std::string& Input_Handler::get_buffer()
+
+void Input_Handler::clear_buffers()
 {
-	return this->buffer;
+	this->text_buffer.clear();
+	this->cmd_buffer.clear();
+}
+
+std::string& Input_Handler::get_text_buffer()
+{
+	return this->text_buffer;
+}
+
+std::string Input_Handler::get_cmd_buffer()
+{
+	std::string temp = cmd_buffer;
+	cmd_buffer.clear();
+	return temp;
 }
