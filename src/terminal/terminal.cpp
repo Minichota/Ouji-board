@@ -1,13 +1,22 @@
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
+#include <cstring>
+
+#include <unistd.h>
+#include <sys/select.h>
+#include <sys/time.h>
+#include <pty.h>
+#include <termios.h>
 
 #include "terminal.hpp"
 #include "error.hpp"
 Terminal::Terminal(SDL_Renderer* const renderer, int x, int y, unsigned short w, unsigned short h, const char* font_path):
 Window(renderer, x, y, w, h),
 cursor_pos{x + border_size, y + border_size, 2, 22},
-text_renderer(renderer, x + border_size, y + border_size, w - border_size * 2, h - border_size * 2, font_path)
+text_renderer(renderer, x + border_size, y + border_size, w - border_size * 2, h - border_size * 2, font_path),
+tty(w/32, h/32)
 {
 }
 
@@ -48,7 +57,11 @@ void Terminal::handle_event(const SDL_Event e)
 			{
 				case SDLK_RETURN:
 				{
-					exec_cmd(input_handler.get_cmd_buffer());
+					std::string out = input_handler.get_cmd_buffer();
+					out.append("\r");
+					tty.send(out);
+					//exec_cmd(input_handler.get_cmd_buffer());
+					input_handler.get_text_buffer().append(tty.get().first);
 				}
 			}
 		}
@@ -57,16 +70,25 @@ void Terminal::handle_event(const SDL_Event e)
 
 void Terminal::exec_cmd(std::string cmd)
 {
-	std::string data;
-	FILE * stream;
-	const int max_buffer = 512;
-	char buffer[max_buffer];
-	cmd.append(" 2>&1");
-	stream = popen(cmd.c_str(), "r");
-	if (stream) {
-		while (!feof(stream))
-			if (fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
-		pclose(stream);
-	}
-	input_handler.get_text_buffer().append(data.c_str());
+	//std::string data;
+	//FILE * stream;
+	//const int max_buffer = 512;
+	//char buffer[max_buffer];
+	//cmd.append(" 2>&1");
+	//stream = popen(cmd.c_str(), "r");
+	//if (stream) {
+		//while (!feof(stream))
+		//{
+			//if (fgets(buffer, max_buffer, stream) != NULL)
+			//{
+				//data.append(buffer);
+			//}
+		//}
+		//pclose(stream);
+	//}
+	//if(data.find("\e[2J") != std::string::npos) {
+		//input_handler.get_text_buffer().clear();
+		//return;
+	//}
+	//input_handler.get_text_buffer().append(data.c_str());
 }

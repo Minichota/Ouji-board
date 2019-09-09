@@ -9,6 +9,7 @@
 #include "main.hpp"
 #include "terminal.hpp"
 #include "error.hpp"
+#include "TTY.hpp"
 
 bool should_close = false;
 
@@ -39,6 +40,8 @@ int main()
 	rend = SDL_CreateRenderer(win, -1, 0);
 
 	Terminal term = Terminal(rend, 0, 0, 1000, 1000, "data/fonts/test.ttf");
+	size_t width = 1000/32, height = 1000/32;
+	TTY tty = TTY(width, height);
 
 	// create window
 	while(!should_close)

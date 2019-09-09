@@ -14,7 +14,12 @@ Sizeable(x, y, w, h),
 font_size(20)
 {
 	font = FC_CreateFont();
-	FC_LoadFont(font, renderer, "data/fonts/test.ttf", font_size, FC_MakeColor(255,255,255,255), TTF_STYLE_NORMAL);
+	if(!FC_LoadFont(font, renderer, "data/fonts/test.ttf", font_size, FC_MakeColor(255,255,255,255), TTF_STYLE_NORMAL))
+	{
+		Error error = Error();
+		error.push_reason("Failed to load font face: ", "data/fonts/test.ttf");
+		error.set_error_code(1);
+	}
 }
 
 Text_Renderer::~Text_Renderer()

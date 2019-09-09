@@ -12,7 +12,7 @@ OBJ_FILES=$(patsubst $(SRC)/%.o,$(O_DIR)/%.o, $(SRC_FILES:.cpp=.o))
 
 VPATH=$(SRC_DIR) $(addprefix $(SRC)/,$(cppdirs))
 
-CXX_FLAGS=$(addprefix -I, $(H_FILES)) `sdl2-config --libs --cflags` -ggdb3 -O3 -Wall -lSDL2_image -lm -std=c++17 -lSDL2_ttf
+CXX_FLAGS=$(addprefix -I, $(H_FILES)) `sdl2-config --libs --cflags` -O3 -Wall -lSDL2_image -lm -std=c++17 -lSDL2_ttf -lutil
 
 all: $(O_DIR)/$(PROGRAM_NAME) | run
 
