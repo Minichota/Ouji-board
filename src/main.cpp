@@ -63,8 +63,11 @@ int main()
 		term.render();
 		SDL_RenderPresent(rend);
 
+		Error::purge_errors();
+
 		SDL_Delay(1000.0f/60.0f);
 	}
+
 	SDL_DestroyWindow(win);
 	SDL_DestroyRenderer(rend);
 	SDL_Quit();

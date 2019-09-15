@@ -9,6 +9,12 @@ class TTY
 	TTY(size_t width, size_t height);
 	~TTY();
 
+	void clear();
+	void destroy(int signal);
+
+	int& get_fd();
+	int& get_pid();
+
 	void send(std::string buffer);
 	std::pair<std::string,int> get();
 	void resize(size_t width, size_t height);

@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 
 #include <unistd.h>
 #include <sys/wait.h>
@@ -17,7 +18,7 @@ TTY::TTY(size_t width, size_t height)
 	pid = forkpty(&fd, nullptr, nullptr, &ws);
 	if(!pid)
 	{
-		static char termstr[] = "TERM=st";
+		static char termstr[] = "TERM=xterm";
 		putenv(termstr);
 		execl(std::getenv("SHELL"), std::getenv("SHELL"), "-i", "-l", nullptr);
 	}
@@ -26,9 +27,28 @@ TTY::TTY(size_t width, size_t height)
 
 TTY::~TTY()
 {
+}
+
+int& TTY::get_fd()
+{
+	return fd;
+}
+
+int& TTY::get_pid()
+{
+	return pid;
+}
+
+void TTY::clear()
+{
 	kill(pid, SIGTERM);
 	close(fd);
 	waitpid(pid, nullptr, 0);
+}
+
+void TTY::destroy(int signal)
+{
+	kill(pid, signal);
 }
 
 void TTY::send(std::string msg)
