@@ -9,7 +9,7 @@
 #include "main.hpp"
 #include "terminal.hpp"
 #include "error.hpp"
-#include "TTY.hpp"
+#include "editor.hpp"
 
 bool should_close = false;
 
@@ -39,9 +39,8 @@ int main()
 
 	rend = SDL_CreateRenderer(win, -1, 0);
 
-	Terminal term = Terminal(rend, 0, 0, 1000, 1000, "data/fonts/test.ttf");
-	size_t width = 1000/32, height = 1000/32;
-	TTY tty = TTY(width, height);
+	//Terminal term = Terminal(rend, 0, 0, 1000, 1000, "data/fonts/test.ttf");
+	Editor editor = Editor(rend, 0, 0, 1000, 1000, "data/fonts/test.ttf");
 
 	// create window
 	while(!should_close)
@@ -50,17 +49,20 @@ int main()
 		SDL_Event e;
 		while(SDL_PollEvent(&e) > 0)
 		{
-			term.handle_event(e);
+			//term.handle_event(e);
+			editor.handle_event(e);
 			handle_event(e);
 			SDL_UpdateWindowSurface(win);
 		}
-		term.update();
+		//term.update();
+		editor.update();
 		// clear the window
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
 		SDL_RenderClear(rend);
 
 		// draw the window
-		term.render();
+		//term.render();
+		editor.render();
 		SDL_RenderPresent(rend);
 
 		Error::purge_errors();

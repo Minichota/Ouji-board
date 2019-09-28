@@ -15,7 +15,7 @@ class Text_Renderer : public Renderable, public Sizeable {
 	void render();
 
 	void push_text(const char* text);
-	void set_text (const char* text);
+	void set_text (std::string text);
 
 	FC_Font* get_font();
 	std::string get_text();

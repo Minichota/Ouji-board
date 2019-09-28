@@ -2,7 +2,7 @@ PROGRAM_NAME=ouji_board
 SRC_DIR=src
 O_DIR=obj
 CXX=g++
-cpp_dirs=errors math terminal
+cpp_dirs=errors math terminal editor
 external_files=$(SRC_DIR)/terminal/SDL_FontCache.o
 SRC=src
 

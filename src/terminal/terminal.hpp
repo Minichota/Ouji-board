@@ -7,7 +7,7 @@
 #include "input_handling.hpp"
 #include "event_handler.hpp"
 #include "SDL_FontCache.h"
-#include "TTY.hpp"
+#include "tty.hpp"
 
 class Terminal : public Window {
 	public:

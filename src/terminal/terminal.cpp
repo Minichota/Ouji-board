@@ -79,7 +79,7 @@ void Terminal::update()
 		e.push_reason("poll error", "");
 	}
 
-	text_renderer.set_text(input_handler.get_text_buffer().c_str());
+	text_renderer.set_text(input_handler.get_text_buffer());
 	text_renderer.update();
 
 	std::string text = text_renderer.get_text();

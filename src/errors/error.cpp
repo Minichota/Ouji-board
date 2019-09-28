@@ -20,7 +20,6 @@ Error::~Error()
 {
 	if(!(error_text[0] == '\0') && !finish)
 	{
-		std::cout << "here" << std::endl;
 		close_window();
 		exit(error_code);
 	}

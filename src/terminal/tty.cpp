@@ -7,7 +7,7 @@
 #include <sys/ioctl.h>
 #include <pty.h>
 
-#include "TTY.hpp"
+#include "tty.hpp"
 
 
 TTY::TTY(size_t width, size_t height)

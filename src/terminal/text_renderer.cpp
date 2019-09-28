@@ -41,9 +41,9 @@ void Text_Renderer::push_text(const char* text)
 	this->text.append(text);
 }
 
-void Text_Renderer::set_text(const char* text)
+void Text_Renderer::set_text(std::string input)
 {
-	this->text = text;
+	this->text = input;
 }
 
 std::string Text_Renderer::get_text()
