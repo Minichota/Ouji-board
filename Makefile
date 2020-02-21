@@ -2,8 +2,7 @@ PROGRAM_NAME=ouji_board
 SRC_DIR=src
 O_DIR=obj
 CXX=g++
-cpp_dirs=errors math terminal editor
-external_files=$(SRC_DIR)/terminal/SDL_FontCache.o
+cpp_dirs=math
 SRC=src
 
 SRC_FILES= $(wildcard $(SRC)/*.cpp $(addsuffix /*.cpp,$(addprefix $(SRC)/,$(cpp_dirs))))
@@ -18,7 +17,7 @@ all: $(O_DIR)/$(PROGRAM_NAME) | run
 
 compile: $(O_DIR)/$(PROGRAM_NAME)
 
-$(O_DIR)/$(PROGRAM_NAME): $(OBJ_FILES) | copy_objects
+$(O_DIR)/$(PROGRAM_NAME): $(OBJ_FILES)
 	$(CXX) -o $@ $^ $(CXX_FLAGS) $(external_files)
 
 $(O_DIR)/%.o: %.cpp | $(addprefix $(O_DIR)/,$(cpp_dirs))
@@ -29,9 +28,6 @@ $(addprefix $(O_DIR)/,$(cpp_dirs)):
 	mkdir -p $@
 
 .PHONY: clean run
-copy_objects:
-	cp -u $(external_files) $(patsubst $(SRC_DIR)/%.o, $(O_DIR)/%.o, $(external_files))
-
 clean:
 	rm -rf $(O_DIR)
 
