@@ -2,6 +2,7 @@
 
 #include "instance.hpp"
 #include "system.hpp"
+#include "tty.hpp"
 #include "vectors.hpp"
 
 static void process_events()
@@ -25,10 +26,6 @@ int main()
 	load_sdl();
 	Ivec instance_size = { window_size.x / 2, window_size.y / 2 };
 	Instance win = Instance(Ivec(0, 0), instance_size, 5);
-	Instance win2 = Instance(Ivec(0, window_size.y / 2), instance_size, 5);
-	Instance win3 = Instance(Ivec(window_size.x / 2, 0), instance_size, 5);
-	Instance win4 =
-		Instance(Ivec(window_size.x / 2, window_size.y / 2), instance_size, 5);
 	while(true)
 	{
 		process_events();
@@ -36,9 +33,6 @@ int main()
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
 		win.render();
-		win2.render();
-		win3.render();
-		win4.render();
 
 		SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
 		/* render */
