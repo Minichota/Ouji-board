@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "system.hpp"
 
@@ -8,7 +9,12 @@ Ivec mouse_pos = Ivec(0, 0);
 
 void load_sdl()
 {
-	if(SDL_Init(SDL_INIT_VIDEO) < 0)
+	if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
+	{
+		fprintf(stderr, "Video init failed: %s\n", SDL_GetError());
+		exit(-1);
+	}
+	if(TTF_Init() < 0)
 	{
 		fprintf(stderr, "Video init failed: %s\n", SDL_GetError());
 		exit(-1);
@@ -24,4 +30,5 @@ void clear_sdl()
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
+	TTF_Quit();
 }

@@ -11,15 +11,19 @@ class Instance
 	Instance(Ivec pos, Ivec size, short border_size);
 	~Instance();
 	void thread_update();
-	void update();
-	void render();
+	virtual void update();
+	virtual void render();
 
-	private:
-	std::thread thread;
+	virtual void process_event(const SDL_Event& event);
+
+	protected:
 	Ivec pos;
 	Ivec size;
 	short border_size;
 	Ivec render_size;
+
+	private:
+	std::thread thread;
 };
 
 #endif

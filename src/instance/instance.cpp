@@ -3,9 +3,10 @@
 #include "instance.hpp"
 #include "system.hpp"
 
-Instance::Instance(Ivec pos, Ivec size, short border_size) :
-pos(pos), size(size)
+Instance::Instance(Ivec pos, Ivec size, short border_size)
 {
+	this->pos = pos;
+	this->size = size;
 	this->thread = std::thread(&Instance::thread_update, this);
 	this->border_size = border_size;
 	this->render_size = { size.x - 2 * border_size, size.y - 2 * border_size };
@@ -44,4 +45,8 @@ void Instance::render()
 		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	}
 	SDL_RenderFillRect(renderer, &rect);
+}
+
+void Instance::process_event(const SDL_Event& event)
+{
 }

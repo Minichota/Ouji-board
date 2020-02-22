@@ -1,9 +1,12 @@
 #include <SDL2/SDL.h>
 
+#include "editor.hpp"
 #include "instance.hpp"
 #include "system.hpp"
-#include "tty.hpp"
 #include "vectors.hpp"
+
+std::vector<Instance*> instances;
+size_t current_instance = 0;
 
 static void process_events()
 {
@@ -18,14 +21,15 @@ static void process_events()
 			}
 			break;
 		}
+		instances[current_instance]->process_event(event);
 	}
 }
-
 int main()
 {
 	load_sdl();
 	Ivec instance_size = { window_size.x / 2, window_size.y / 2 };
-	Instance win = Instance(Ivec(0, 0), instance_size, 5);
+	Editor win = Editor(Ivec(0, 0), instance_size, 5);
+	instances.push_back(&win);
 	while(true)
 	{
 		process_events();
