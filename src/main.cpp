@@ -1,27 +1,8 @@
 #include <SDL2/SDL.h>
 
+#include "instance.hpp"
+#include "system.hpp"
 #include "vectors.hpp"
-
-/*
-   global variables
-*/
-
-SDL_Window* window;
-SDL_Renderer* renderer;
-const Ivec window_size = { 1920, 1080 };
-
-static void load_sdl()
-{
-	if(SDL_Init(SDL_INIT_VIDEO) < 0)
-	{
-		fprintf(stderr, "Video init failed: %s\n", SDL_GetError());
-		exit(-1);
-	}
-	window = SDL_CreateWindow("Ouji board", SDL_WINDOWPOS_CENTERED,
-							  SDL_WINDOWPOS_CENTERED, window_size.x,
-							  window_size.y, SDL_WINDOW_RESIZABLE);
-	renderer = SDL_CreateRenderer(window, -1, 0);
-}
 
 static void process_events()
 {
@@ -42,14 +23,30 @@ static void process_events()
 int main()
 {
 	load_sdl();
+	Ivec instance_size = { window_size.x / 2, window_size.y / 2 };
+	Instance win = Instance(Ivec(0, 0), instance_size, 5);
+	Instance win2 = Instance(Ivec(0, window_size.y / 2), instance_size, 5);
+	Instance win3 = Instance(Ivec(window_size.x / 2, 0), instance_size, 5);
+	Instance win4 =
+		Instance(Ivec(window_size.x / 2, window_size.y / 2), instance_size, 5);
 	while(true)
 	{
 		process_events();
 
-		/* render */
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
+		win.render();
+		win2.render();
+		win3.render();
+		win4.render();
+
+		SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
+		/* render */
 		SDL_RenderPresent(renderer);
+
+		SDL_Delay(1000.0f / 144.0f);
 	}
 
+	clear_sdl();
 	return 0;
 }
