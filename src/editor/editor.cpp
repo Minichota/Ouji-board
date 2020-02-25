@@ -23,21 +23,58 @@ Editor::~Editor()
 
 void Editor::update()
 {
+	if((int)row * glyph_size.x - glyph_size.x * scroll_chars.x > size.x)
+	{
+		scroll_chars.x++;
+	}
+	if((int)row - scroll_chars.x < 0)
+	{
+		scroll_chars.x -= 10;
+		if(scroll_chars.x < 0)
+		{
+			scroll_chars.x = 0;
+		}
+	}
 }
 
 void Editor::render()
 {
 	if(changed && text.size() > 0)
 	{
+		TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
 		if(render_texture != nullptr)
 		{
 			SDL_DestroyTexture(render_texture);
 		}
-		const char* surface_text = text[0].c_str();
-		SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(
-			font, surface_text, SDL_Color{ 255, 0, 0, 255 }, size.x);
-		render_texture = SDL_CreateTextureFromSurface(renderer, surface);
-		SDL_FreeSurface(surface);
+		// a new blank texture
+		SDL_Texture* render_complete =
+			SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+							  SDL_TEXTUREACCESS_TARGET, size.x, size.y);
+
+		// setting to draw to blank texture
+		SDL_SetRenderTarget(renderer, render_complete);
+		SDL_Surface* surface;
+		SDL_Texture* texture_part;
+
+		// rendering each layer to blank texture
+		for(size_t i = 0; i < text.size(); i++)
+		{
+			const char* surface_text = text[i].c_str();
+			surface = TTF_RenderText_Blended(font, surface_text,
+											 SDL_Color{ 255, 0, 0, 255 });
+			texture_part = SDL_CreateTextureFromSurface(renderer, surface);
+			SDL_Rect line_pos;
+			SDL_QueryTexture(texture_part, nullptr, nullptr, &line_pos.w,
+							 &line_pos.h);
+			line_pos.x = pos.x - scroll_chars.x * glyph_size.x;
+			line_pos.y = pos.y + i * line_pos.h;
+			SDL_RenderCopy(renderer, texture_part, NULL, &line_pos);
+			SDL_FreeSurface(surface);
+			SDL_DestroyTexture(texture_part);
+		}
+		// assigning blank texture to classes texture and resetting renderer
+		render_texture = render_complete;
+		SDL_SetRenderTarget(renderer, NULL);
 		changed = false;
 	}
 	if(render_texture != nullptr)
@@ -45,18 +82,14 @@ void Editor::render()
 		SDL_Rect rect = { pos.x, pos.y };
 		SDL_QueryTexture(render_texture, nullptr, nullptr, &rect.w, &rect.h);
 		SDL_RenderCopy(renderer, render_texture, nullptr, &rect);
-
-		SDL_Rect cursor;
-		TTF_SizeText(font, " ", &cursor.w, &cursor.h);
-		int char_count = size.x / cursor.w;
-		int wrap_count = rect.h / cursor.h - 1;
-		std::cout << char_count << " " << wrap_count << " " << row << std::endl;
-		cursor.x = pos.x + cursor.w * (row - char_count * wrap_count);
-		cursor.y = pos.y + cursor.h * wrap_count;
-
-		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-		SDL_RenderDrawRect(renderer, &cursor);
 	}
+	SDL_Rect cursor = { pos.x + glyph_size.x * (int)row -
+							scroll_chars.x * glyph_size.x,
+						pos.y + glyph_size.y * (int)col, glyph_size.x,
+						glyph_size.y };
+
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderDrawRect(renderer, &cursor);
 }
 
 void Editor::process_event(const SDL_Event& event)
@@ -65,9 +98,12 @@ void Editor::process_event(const SDL_Event& event)
 	{
 		case SDL_TEXTINPUT:
 		{
-			this->text[0].append(event.text.text);
+			for(char* c = (char*)event.text.text; *c != '\0'; c++)
+			{
+				this->text[col].insert(this->text[col].begin() + row, *c);
+				row++;
+			}
 			changed = true;
-			row++;
 		}
 		break;
 		case SDL_KEYDOWN:
@@ -76,23 +112,68 @@ void Editor::process_event(const SDL_Event& event)
 			{
 				case SDLK_BACKSPACE:
 				{
-					if(this->text[0].size() > 0)
+					if(this->text[col].size() > 0 && row != 0)
 					{
-						this->text[0].pop_back();
-						changed = true;
 						row--;
+						this->text[col].erase(this->text[col].begin() + row);
 					}
-					else
+					else if(col != 0)
 					{
-						// index--;
-						// changed = true;
+						this->col--;
+						if(text[col].size() != 0)
+						{
+							std::string copy = text[col + 1];
+							text.erase(text.begin() + col + 1);
+							text[col].append(copy);
+							row = text[col].size() - copy.size();
+						}
 					}
+					changed = true;
 				}
 				break;
 				case SDLK_RETURN:
 				{
-					// index++;
-					// changed = true;
+					std::string copy_to_end = this->text[col].substr(row);
+					this->text[col].erase(this->text[col].begin() + row,
+										  this->text[col].end());
+					col++;
+					row = 0;
+					changed = true;
+					this->text.emplace(this->text.begin() + col);
+					this->text[col].append(copy_to_end);
+				}
+				break;
+				case SDLK_UP:
+				{
+					if(col != 0)
+					{
+						col--;
+					}
+				}
+				break;
+				case SDLK_DOWN:
+				{
+					col++;
+					if(col > this->text.size() - 1)
+					{
+						col = this->text.size() - 1;
+					}
+				}
+				break;
+				case SDLK_RIGHT:
+				{
+					if(row != this->text[col].size())
+					{
+						row++;
+					}
+				}
+				break;
+				case SDLK_LEFT:
+				{
+					if(row != 0)
+					{
+						row--;
+					}
 				}
 				break;
 			}

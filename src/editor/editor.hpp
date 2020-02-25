@@ -23,6 +23,9 @@ class Editor : public Instance
 	TTF_Font* font;
 	SDL_Texture* render_texture;
 
+	Ivec scroll_chars;
+	Ivec glyph_size;
+
 	bool changed;
 };
 
