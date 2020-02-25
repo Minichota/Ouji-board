@@ -23,7 +23,7 @@ Editor::~Editor()
 
 void Editor::update()
 {
-	if((int)row * glyph_size.x - glyph_size.x * scroll_chars.x > size.x)
+	if((int)row - scroll_chars.x >= num_cells.x)
 	{
 		scroll_chars.x++;
 	}
@@ -35,6 +35,18 @@ void Editor::update()
 			scroll_chars.x = 0;
 		}
 	}
+	if((int)col - scroll_chars.y >= num_cells.y)
+	{
+		scroll_chars.y++;
+	}
+	if((int)col - scroll_chars.y < 0)
+	{
+		scroll_chars.y -= 10;
+		if(scroll_chars.y < 0)
+		{
+			scroll_chars.y = 0;
+		}
+	}
 }
 
 void Editor::render()
@@ -42,6 +54,7 @@ void Editor::render()
 	if(changed && text.size() > 0)
 	{
 		TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
+		this->num_cells = Ivec(size.x / glyph_size.x, size.y / glyph_size.y);
 		if(render_texture != nullptr)
 		{
 			SDL_DestroyTexture(render_texture);
@@ -67,7 +80,7 @@ void Editor::render()
 			SDL_QueryTexture(texture_part, nullptr, nullptr, &line_pos.w,
 							 &line_pos.h);
 			line_pos.x = pos.x - scroll_chars.x * glyph_size.x;
-			line_pos.y = pos.y + i * line_pos.h;
+			line_pos.y = pos.y + i * line_pos.h - scroll_chars.y * glyph_size.y;
 			SDL_RenderCopy(renderer, texture_part, NULL, &line_pos);
 			SDL_FreeSurface(surface);
 			SDL_DestroyTexture(texture_part);
@@ -83,10 +96,11 @@ void Editor::render()
 		SDL_QueryTexture(render_texture, nullptr, nullptr, &rect.w, &rect.h);
 		SDL_RenderCopy(renderer, render_texture, nullptr, &rect);
 	}
-	SDL_Rect cursor = { pos.x + glyph_size.x * (int)row -
-							scroll_chars.x * glyph_size.x,
-						pos.y + glyph_size.y * (int)col, glyph_size.x,
-						glyph_size.y };
+	SDL_Rect cursor = {
+		pos.x + glyph_size.x * (int)row - scroll_chars.x * glyph_size.x,
+		pos.y + glyph_size.y * (int)col - scroll_chars.y * glyph_size.y,
+		glyph_size.x, glyph_size.y
+	};
 
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderDrawRect(renderer, &cursor);

@@ -25,6 +25,7 @@ class Editor : public Instance
 
 	Ivec scroll_chars;
 	Ivec glyph_size;
+	Ivec num_cells;
 
 	bool changed;
 };
