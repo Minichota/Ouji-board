@@ -15,6 +15,7 @@ Editor::Editor(Ivec pos, Ivec size, short border) : Instance(pos, size, border)
 	this->col = 0;
 	text.emplace_back();
 	SDL_StartTextInput();
+	scroll_chars = { 0, 0 };
 }
 
 Editor::~Editor()
@@ -23,37 +24,39 @@ Editor::~Editor()
 
 void Editor::update()
 {
-	if((int)row - scroll_chars.x >= num_cells.x)
+	while((int)row - scroll_chars.x >= num_cells.x)
 	{
 		scroll_chars.x++;
 	}
-	if((int)row - scroll_chars.x < 0)
+	while((int)row - scroll_chars.x < 0)
 	{
 		scroll_chars.x -= 10;
 		if(scroll_chars.x < 0)
 		{
 			scroll_chars.x = 0;
+			break;
 		}
 	}
-	if((int)col - scroll_chars.y >= num_cells.y)
+	while((int)col - scroll_chars.y >= num_cells.y)
 	{
 		scroll_chars.y++;
 	}
-	if((int)col - scroll_chars.y < 0)
+	while((int)col - scroll_chars.y < 0)
 	{
 		scroll_chars.y -= 10;
 		if(scroll_chars.y < 0)
 		{
 			scroll_chars.y = 0;
+			break;
 		}
 	}
 }
 
 void Editor::render()
 {
+	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
 	if(changed && text.size() > 0)
 	{
-		TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
 		this->num_cells = Ivec(size.x / glyph_size.x, size.y / glyph_size.y);
 		if(render_texture != nullptr)
 		{
@@ -92,10 +95,13 @@ void Editor::render()
 	}
 	if(render_texture != nullptr)
 	{
+		// rendering all text
 		SDL_Rect rect = { pos.x, pos.y };
 		SDL_QueryTexture(render_texture, nullptr, nullptr, &rect.w, &rect.h);
 		SDL_RenderCopy(renderer, render_texture, nullptr, &rect);
 	}
+
+	// rendering cursor
 	SDL_Rect cursor = {
 		pos.x + glyph_size.x * (int)row - scroll_chars.x * glyph_size.x,
 		pos.y + glyph_size.y * (int)col - scroll_chars.y * glyph_size.y,
@@ -112,6 +118,7 @@ void Editor::process_event(const SDL_Event& event)
 	{
 		case SDL_TEXTINPUT:
 		{
+			// normal text
 			for(char* c = (char*)event.text.text; *c != '\0'; c++)
 			{
 				this->text[col].insert(this->text[col].begin() + row, *c);
@@ -128,11 +135,14 @@ void Editor::process_event(const SDL_Event& event)
 				{
 					if(this->text[col].size() > 0 && row != 0)
 					{
+						// removal of single char
 						row--;
 						this->text[col].erase(this->text[col].begin() + row);
 					}
 					else if(col != 0)
 					{
+						// removal of newline char
+						// new line gets moved to end of prev line
 						this->col--;
 						if(text[col].size() != 0)
 						{
@@ -147,6 +157,7 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_RETURN:
 				{
+					// inserts new line
 					std::string copy_to_end = this->text[col].substr(row);
 					this->text[col].erase(this->text[col].begin() + row,
 										  this->text[col].end());
@@ -159,6 +170,7 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_UP:
 				{
+					// moves up one char
 					if(col != 0)
 					{
 						col--;
@@ -167,6 +179,7 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_DOWN:
 				{
+					// moves down one char
 					col++;
 					if(col > this->text.size() - 1)
 					{
@@ -176,6 +189,7 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_RIGHT:
 				{
+					// moves right one char
 					if(row != this->text[col].size())
 					{
 						row++;
@@ -184,6 +198,7 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_LEFT:
 				{
+					// moves left one char
 					if(row != 0)
 					{
 						row--;
