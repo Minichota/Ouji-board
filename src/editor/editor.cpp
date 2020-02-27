@@ -27,7 +27,8 @@ void Editor::update()
 {
 	while((int)row - scroll_chars.x >= num_cells.x - 1)
 	{
-		scroll_chars.x++;
+		scroll_chars.x += 2;
+		changed = true;
 	}
 	while((int)row - scroll_chars.x < 0)
 	{
@@ -37,10 +38,12 @@ void Editor::update()
 			scroll_chars.x = 0;
 			break;
 		}
+		changed = true;
 	}
 	while((int)col - scroll_chars.y >= num_cells.y - 1)
 	{
-		scroll_chars.y++;
+		scroll_chars.y += 2;
+		changed = true;
 	}
 	while((int)col - scroll_chars.y < 0)
 	{
@@ -50,6 +53,7 @@ void Editor::update()
 			scroll_chars.y = 0;
 			break;
 		}
+		changed = true;
 	}
 }
 
