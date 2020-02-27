@@ -9,7 +9,7 @@
 class Editor : public Instance
 {
 	public:
-	Editor(Ivec pos, Ivec size, short border);
+	Editor(Ivec pos, Ivec size, short border_size);
 	~Editor();
 
 	void update() override;

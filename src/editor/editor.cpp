@@ -1,7 +1,8 @@
 #include "editor.hpp"
 #include "system.hpp"
 
-Editor::Editor(Ivec pos, Ivec size, short border) : Instance(pos, size, border)
+Editor::Editor(Ivec pos, Ivec size, short border_size) :
+Instance(pos, size, border_size)
 {
 	font = TTF_OpenFont("res/font/RobotoMono-Regular.ttf", 32);
 	if(!font)
@@ -24,7 +25,7 @@ Editor::~Editor()
 
 void Editor::update()
 {
-	while((int)row - scroll_chars.x >= num_cells.x)
+	while((int)row - scroll_chars.x >= num_cells.x - 1)
 	{
 		scroll_chars.x++;
 	}
@@ -37,7 +38,7 @@ void Editor::update()
 			break;
 		}
 	}
-	while((int)col - scroll_chars.y >= num_cells.y)
+	while((int)col - scroll_chars.y >= num_cells.y - 1)
 	{
 		scroll_chars.y++;
 	}
@@ -54,18 +55,20 @@ void Editor::update()
 
 void Editor::render()
 {
+	Instance::render();
 	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
 	if(changed && text.size() > 0)
 	{
-		this->num_cells = Ivec(size.x / glyph_size.x, size.y / glyph_size.y);
+		this->num_cells =
+			Ivec(render_size.x / glyph_size.x, render_size.y / glyph_size.y);
 		if(render_texture != nullptr)
 		{
 			SDL_DestroyTexture(render_texture);
 		}
 		// a new blank texture
-		SDL_Texture* render_complete =
-			SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
-							  SDL_TEXTUREACCESS_TARGET, size.x, size.y);
+		SDL_Texture* render_complete = SDL_CreateTexture(
+			renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+			render_size.x - border_size * 2, render_size.y - border_size * 2);
 
 		// setting to draw to blank texture
 		SDL_SetRenderTarget(renderer, render_complete);
@@ -96,17 +99,17 @@ void Editor::render()
 	if(render_texture != nullptr)
 	{
 		// rendering all text
-		SDL_Rect rect = { pos.x, pos.y };
+		SDL_Rect rect = { pos.x + border_size, pos.y + border_size };
 		SDL_QueryTexture(render_texture, nullptr, nullptr, &rect.w, &rect.h);
 		SDL_RenderCopy(renderer, render_texture, nullptr, &rect);
 	}
 
 	// rendering cursor
-	SDL_Rect cursor = {
-		pos.x + glyph_size.x * (int)row - scroll_chars.x * glyph_size.x,
-		pos.y + glyph_size.y * (int)col - scroll_chars.y * glyph_size.y,
-		glyph_size.x, glyph_size.y
-	};
+	SDL_Rect cursor = { pos.x + glyph_size.x * (int)row -
+							scroll_chars.x * glyph_size.x + border_size,
+						pos.y + glyph_size.y * (int)col -
+							scroll_chars.y * glyph_size.y + border_size,
+						glyph_size.x, glyph_size.y };
 
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderDrawRect(renderer, &cursor);
@@ -157,15 +160,42 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_RETURN:
 				{
-					// inserts new line
-					std::string copy_to_end = this->text[col].substr(row);
-					this->text[col].erase(this->text[col].begin() + row,
-										  this->text[col].end());
-					col++;
-					row = 0;
-					changed = true;
-					this->text.emplace(this->text.begin() + col);
-					this->text[col].append(copy_to_end);
+					const Uint8* keys = SDL_GetKeyboardState(NULL);
+					if(keys[SDL_SCANCODE_LSHIFT])
+					{
+						this->text.emplace(this->text.begin() + col);
+						changed = true;
+						row = 0;
+					}
+					else
+					{
+						// inserts new line
+						std::string copy_to_end = this->text[col].substr(row);
+						this->text[col].erase(this->text[col].begin() + row,
+											  this->text[col].end());
+						col++;
+						row = 0;
+						changed = true;
+						this->text.emplace(this->text.begin() + col);
+						this->text[col].append(copy_to_end);
+					}
+				}
+				break;
+				case SDLK_k:
+				{
+					const Uint8* keys = SDL_GetKeyboardState(NULL);
+					if(keys[SDL_SCANCODE_LCTRL])
+					{
+						// moves up one char
+						if(col != 0)
+						{
+							col--;
+							if(row > this->text[col].size())
+							{
+								row = this->text[col].size();
+							}
+						}
+					}
 				}
 				break;
 				case SDLK_UP:
@@ -174,6 +204,28 @@ void Editor::process_event(const SDL_Event& event)
 					if(col != 0)
 					{
 						col--;
+						if(row > this->text[col].size())
+						{
+							row = this->text[col].size();
+						}
+					}
+				}
+				break;
+				case SDLK_j:
+				{
+					const Uint8* keys = SDL_GetKeyboardState(NULL);
+					if(keys[SDL_SCANCODE_LCTRL])
+					{
+						// moves down one char
+						col++;
+						if(col > this->text.size() - 1)
+						{
+							col = this->text.size() - 1;
+						}
+						if(row > this->text[col].size())
+						{
+							row = this->text[col].size();
+						}
 					}
 				}
 				break;
@@ -184,6 +236,23 @@ void Editor::process_event(const SDL_Event& event)
 					if(col > this->text.size() - 1)
 					{
 						col = this->text.size() - 1;
+					}
+					if(row > this->text[col].size())
+					{
+						row = this->text[col].size();
+					}
+				}
+				break;
+				case SDLK_l:
+				{
+					const Uint8* keys = SDL_GetKeyboardState(NULL);
+					if(keys[SDL_SCANCODE_LCTRL])
+					{
+						// moves right one char
+						if(row != this->text[col].size())
+						{
+							row++;
+						}
 					}
 				}
 				break;
@@ -196,6 +265,19 @@ void Editor::process_event(const SDL_Event& event)
 					}
 				}
 				break;
+				case SDLK_h:
+				{
+					const Uint8* keys = SDL_GetKeyboardState(NULL);
+					if(keys[SDL_SCANCODE_LCTRL])
+					{
+						// moves left one char
+						if(row != 0)
+						{
+							row--;
+						}
+					}
+				}
+				break;
 				case SDLK_LEFT:
 				{
 					// moves left one char
@@ -203,6 +285,44 @@ void Editor::process_event(const SDL_Event& event)
 					{
 						row--;
 					}
+				}
+				break;
+				case SDLK_b:
+				{
+					const Uint8* keys = SDL_GetKeyboardState(NULL);
+					if(keys[SDL_SCANCODE_LCTRL])
+					{
+						if(row != 0)
+						{
+							for(char* c = &text[col][row - 1];
+								*c != ' ' && row != 0; c = &text[col][row])
+							{
+								row--;
+							}
+						}
+					}
+				}
+				break;
+				case SDLK_n:
+				{
+					const Uint8* keys = SDL_GetKeyboardState(NULL);
+					if(keys[SDL_SCANCODE_LCTRL])
+					{
+						for(char* c = &text[col][row - 1];
+							*c != ' ' && row != text[col].size();
+							c = &text[col][row])
+						{
+							row++;
+						}
+					}
+				}
+				break;
+				case SDLK_TAB:
+				{
+					std::cout << "wow" << std::endl;
+					this->text[col].insert(row, "    ");
+					row += 4;
+					changed = true;
 				}
 				break;
 			}

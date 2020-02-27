@@ -32,18 +32,9 @@ void Instance::update()
 
 void Instance::render()
 {
-	SDL_Rect rect = { pos.x + border_size, pos.y + border_size, render_size.x,
-					  render_size.y };
-	SDL_Point p = SDL_Point{ mouse_pos.x, mouse_pos.y };
-	if(SDL_PointInRect(&p, &rect))
-	{
 
-		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-	}
-	else
-	{
-		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	}
+	SDL_Rect rect = { pos.x, pos.y, render_size.x, render_size.y };
+	SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
 	SDL_RenderFillRect(renderer, &rect);
 }
 
