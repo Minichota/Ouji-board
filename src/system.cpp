@@ -1,7 +1,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <vector>
 
 #include "system.hpp"
+
+std::vector<Instance*> instances;
+size_t current_instance = 0;
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;

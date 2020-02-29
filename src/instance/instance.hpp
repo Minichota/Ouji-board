@@ -16,6 +16,10 @@ class Instance
 
 	virtual void process_event(const SDL_Event& event);
 
+	bool collides(Ivec m_pos);
+
+	bool active;
+
 	protected:
 	Ivec pos;
 	Ivec size;

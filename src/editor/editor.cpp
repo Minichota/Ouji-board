@@ -89,8 +89,8 @@ void Editor::render()
 			SDL_Rect line_pos;
 			SDL_QueryTexture(texture_part, nullptr, nullptr, &line_pos.w,
 							 &line_pos.h);
-			line_pos.x = pos.x - scroll_chars.x * glyph_size.x;
-			line_pos.y = pos.y + i * line_pos.h - scroll_chars.y * glyph_size.y;
+			line_pos.x = -scroll_chars.x * glyph_size.x;
+			line_pos.y = i * line_pos.h - scroll_chars.y * glyph_size.y;
 			SDL_RenderCopy(renderer, texture_part, NULL, &line_pos);
 			SDL_FreeSurface(surface);
 			SDL_DestroyTexture(texture_part);
@@ -323,7 +323,6 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_TAB:
 				{
-					std::cout << "wow" << std::endl;
 					this->text[col].insert(row, "    ");
 					row += 4;
 					changed = true;
