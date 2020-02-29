@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include "editor.hpp"
 #include "system.hpp"
 
@@ -14,9 +16,10 @@ Instance(pos, size, border_size)
 	this->changed = true;
 	this->row = 0;
 	this->col = 0;
-	text.emplace_back();
 	SDL_StartTextInput();
 	scroll_chars = { 0, 0 };
+
+	read("res/test/test.txt");
 }
 
 Editor::~Editor()
@@ -188,7 +191,7 @@ void Editor::process_event(const SDL_Event& event)
 				case SDLK_k:
 				{
 					const Uint8* keys = SDL_GetKeyboardState(NULL);
-					if(keys[SDL_SCANCODE_LCTRL])
+					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
 					{
 						// moves up one char
 						if(col != 0)
@@ -218,7 +221,7 @@ void Editor::process_event(const SDL_Event& event)
 				case SDLK_j:
 				{
 					const Uint8* keys = SDL_GetKeyboardState(NULL);
-					if(keys[SDL_SCANCODE_LCTRL])
+					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
 					{
 						// moves down one char
 						col++;
@@ -250,7 +253,7 @@ void Editor::process_event(const SDL_Event& event)
 				case SDLK_l:
 				{
 					const Uint8* keys = SDL_GetKeyboardState(NULL);
-					if(keys[SDL_SCANCODE_LCTRL])
+					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
 					{
 						// moves right one char
 						if(row != this->text[col].size())
@@ -272,7 +275,7 @@ void Editor::process_event(const SDL_Event& event)
 				case SDLK_h:
 				{
 					const Uint8* keys = SDL_GetKeyboardState(NULL);
-					if(keys[SDL_SCANCODE_LCTRL])
+					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
 					{
 						// moves left one char
 						if(row != 0)
@@ -328,8 +331,54 @@ void Editor::process_event(const SDL_Event& event)
 					changed = true;
 				}
 				break;
+				case SDLK_r:
+				{
+					// reload
+					const uint8_t* keys = SDL_GetKeyboardState(NULL);
+					if(keys[SDL_SCANCODE_LCTRL])
+					{
+						read(std::string("res/test/test.txt"));
+						changed = true;
+						std::cout << "reload" << std::endl;
+					}
+				}
+				break;
+				case SDLK_F4:
+				{
+					save(std::string("res/test/test.txt"));
+				}
+				break;
 			}
 		}
 		break;
+	}
+}
+
+void Editor::read(std::string path)
+{
+	this->text.clear();
+	std::ifstream ifstream;
+	ifstream.open(path);
+	if(ifstream.is_open())
+	{
+		for(std::string line; std::getline(ifstream, line);)
+		{
+			this->text.push_back(line);
+		}
+		ifstream.close();
+	}
+}
+
+void Editor::save(std::string path)
+{
+	std::ofstream ofstream;
+	ofstream.open(path);
+	if(ofstream.is_open())
+	{
+		for(std::string line : this->text)
+		{
+			ofstream << line << '\n';
+		}
+		ofstream.close();
 	}
 }

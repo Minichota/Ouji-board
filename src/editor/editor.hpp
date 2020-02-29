@@ -17,6 +17,9 @@ class Editor : public Instance
 
 	void process_event(const SDL_Event& event) override;
 
+	void read(std::string path);
+	void save(std::string path);
+
 	private:
 	std::vector<std::string> text;
 	size_t col, row;
