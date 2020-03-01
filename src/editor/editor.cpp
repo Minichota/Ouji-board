@@ -154,7 +154,7 @@ void Editor::process_event(const SDL_Event& event)
 						// removal of newline char
 						// new line gets moved to end of prev line
 						this->col--;
-						if(text[col].size() != 0)
+						if(text[col + 1].size() != 0)
 						{
 							std::string copy = text[col + 1];
 							text.erase(text.begin() + col + 1);
