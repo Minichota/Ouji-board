@@ -74,11 +74,11 @@ void Editor::render()
 		}
 		// a new blank texture
 		SDL_Texture* render_complete = SDL_CreateTexture(
-			renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+			SDL::renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
 			render_size.x - border_size * 2, render_size.y - border_size * 2);
 
 		// setting to draw to blank texture
-		SDL_SetRenderTarget(renderer, render_complete);
+		SDL_SetRenderTarget(SDL::renderer, render_complete);
 		SDL_Surface* surface;
 		SDL_Texture* texture_part;
 
@@ -88,19 +88,19 @@ void Editor::render()
 			const char* surface_text = text[i].c_str();
 			surface = TTF_RenderText_Blended(font, surface_text,
 											 SDL_Color{ 255, 0, 0, 255 });
-			texture_part = SDL_CreateTextureFromSurface(renderer, surface);
+			texture_part = SDL_CreateTextureFromSurface(SDL::renderer, surface);
 			SDL_Rect line_pos;
 			SDL_QueryTexture(texture_part, nullptr, nullptr, &line_pos.w,
 							 &line_pos.h);
 			line_pos.x = -scroll_chars.x * glyph_size.x;
 			line_pos.y = i * line_pos.h - scroll_chars.y * glyph_size.y;
-			SDL_RenderCopy(renderer, texture_part, NULL, &line_pos);
+			SDL_RenderCopy(SDL::renderer, texture_part, NULL, &line_pos);
 			SDL_FreeSurface(surface);
 			SDL_DestroyTexture(texture_part);
 		}
 		// assigning blank texture to classes texture and resetting renderer
 		render_texture = render_complete;
-		SDL_SetRenderTarget(renderer, NULL);
+		SDL_SetRenderTarget(SDL::renderer, NULL);
 		changed = false;
 	}
 	if(render_texture != nullptr)
@@ -108,7 +108,7 @@ void Editor::render()
 		// rendering all text
 		SDL_Rect rect = { pos.x + border_size, pos.y + border_size };
 		SDL_QueryTexture(render_texture, nullptr, nullptr, &rect.w, &rect.h);
-		SDL_RenderCopy(renderer, render_texture, nullptr, &rect);
+		SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &rect);
 	}
 
 	// rendering cursor
@@ -118,8 +118,8 @@ void Editor::render()
 							scroll_chars.y * glyph_size.y + border_size,
 						glyph_size.x, glyph_size.y };
 
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	SDL_RenderDrawRect(renderer, &cursor);
+	SDL_SetRenderDrawColor(SDL::renderer, 255, 255, 255, 255);
+	SDL_RenderDrawRect(SDL::renderer, &cursor);
 }
 
 void Editor::process_event(const SDL_Event& event)

@@ -10,11 +10,14 @@
 extern std::vector<Instance*> instances;
 extern size_t current_instance;
 
+namespace SDL
+{
 extern SDL_Renderer* renderer;
 extern SDL_Window* window;
 extern Ivec mouse_pos;
 const static Ivec window_size = { 1920, 1080 };
 void load_sdl();
 void clear_sdl();
+};
 
 #endif

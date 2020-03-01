@@ -5,6 +5,8 @@
 #include "system.hpp"
 #include "vectors.hpp"
 
+using namespace SDL;
+
 static void process_events()
 {
 	SDL_Event event;

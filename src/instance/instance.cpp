@@ -38,14 +38,14 @@ void Instance::render()
 {
 	if(active)
 	{
-		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+		SDL_SetRenderDrawColor(SDL::renderer, 0, 0, 255, 255);
 	}
 	else
 	{
-		SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+		SDL_SetRenderDrawColor(SDL::renderer, 255, 0, 255, 255);
 	}
 	SDL_Rect rect = { pos.x, pos.y, render_size.x, render_size.y };
-	SDL_RenderFillRect(renderer, &rect);
+	SDL_RenderFillRect(SDL::renderer, &rect);
 }
 
 void Instance::process_event(const SDL_Event& event)

@@ -7,6 +7,9 @@
 std::vector<Instance*> instances;
 size_t current_instance = 0;
 
+namespace SDL
+{
+
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 Ivec mouse_pos = Ivec(0, 0);
@@ -35,4 +38,5 @@ void clear_sdl()
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
 	TTF_Quit();
+}
 }
