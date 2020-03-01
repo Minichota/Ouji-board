@@ -301,10 +301,22 @@ void Editor::process_event(const SDL_Event& event)
 					{
 						if(row != 0)
 						{
-							for(char* c = &text[col][row - 1];
-								*c != ' ' && row != 0; c = &text[col][row])
+							for(char* c = &text[col][row]; *c != ' ';
+								c = &text[col][row + 1])
 							{
-								row--;
+								if(row == 0)
+								{
+									if(col > 0)
+									{
+										col--;
+										row = text[col].size();
+									}
+									break;
+								}
+								else
+								{
+									row--;
+								}
 							}
 						}
 					}
@@ -315,11 +327,22 @@ void Editor::process_event(const SDL_Event& event)
 					const Uint8* keys = SDL_GetKeyboardState(NULL);
 					if(keys[SDL_SCANCODE_LCTRL])
 					{
-						for(char* c = &text[col][row - 1];
-							*c != ' ' && row != text[col].size();
-							c = &text[col][row])
+						for(char* c = &text[col][row]; *c != ' ';
+							c = &text[col][row - 1])
 						{
-							row++;
+							if(row == text[col].size())
+							{
+								if(col + 1 < text.size())
+								{
+									col++;
+									row = 0;
+								}
+								break;
+							}
+							else
+							{
+								row++;
+							}
 						}
 					}
 				}
