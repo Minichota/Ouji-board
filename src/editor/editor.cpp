@@ -6,12 +6,7 @@
 Editor::Editor(Ivec pos, Ivec size, short border_size) :
 Instance(pos, size, border_size)
 {
-	font = TTF_OpenFont("res/font/RobotoMono-Regular.ttf", 32);
-	if(!font)
-	{
-		fprintf(stderr, "failed to load font: %s", TTF_GetError());
-		exit(-1);
-	}
+	font = Resources::get_font(Resources::MONO);
 	this->render_texture = nullptr;
 	this->changed = true;
 	this->row = 0;
@@ -63,6 +58,8 @@ void Editor::update()
 void Editor::render()
 {
 	Instance::render();
+	// rendering cursor
+
 	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
 	if(changed && text.size() > 0)
 	{
@@ -111,15 +108,22 @@ void Editor::render()
 		SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &rect);
 	}
 
-	// rendering cursor
 	SDL_Rect cursor = { pos.x + glyph_size.x * (int)row -
 							scroll_chars.x * glyph_size.x + border_size,
 						pos.y + glyph_size.y * (int)col -
 							scroll_chars.y * glyph_size.y + border_size,
 						glyph_size.x, glyph_size.y };
 
-	SDL_SetRenderDrawColor(SDL::renderer, 255, 255, 255, 255);
-	SDL_RenderDrawRect(SDL::renderer, &cursor);
+	SDL_SetRenderDrawColor(SDL::renderer, 255, 255, 255, 100);
+	SDL_SetRenderDrawBlendMode(SDL::renderer, SDL_BLENDMODE_BLEND);
+	if(active)
+	{
+		SDL_RenderFillRect(SDL::renderer, &cursor);
+	}
+	else
+	{
+		SDL_RenderDrawRect(SDL::renderer, &cursor);
+	}
 }
 
 void Editor::process_event(const SDL_Event& event)
@@ -319,6 +323,14 @@ void Editor::process_event(const SDL_Event& event)
 								}
 							}
 						}
+						else
+						{
+							if(col > 0)
+							{
+								col--;
+								row = text[col].size();
+							}
+						}
 					}
 				}
 				break;
@@ -362,7 +374,6 @@ void Editor::process_event(const SDL_Event& event)
 					{
 						read(std::string("res/test/test.txt"));
 						changed = true;
-						std::cout << "reload" << std::endl;
 					}
 				}
 				break;

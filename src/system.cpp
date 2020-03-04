@@ -40,3 +40,27 @@ void clear_sdl()
 	TTF_Quit();
 }
 }
+
+namespace Resources
+{
+std::vector<TTF_Font*> fonts;
+std::vector<std::string> font_paths = { "res/font/RobotoMono-Regular.ttf" };
+void load_res()
+{
+	for(std::string font_path : font_paths)
+	{
+		fonts.push_back(TTF_OpenFont(font_path.c_str(), 12));
+	}
+}
+void clear_res()
+{
+	for(TTF_Font* font : fonts)
+	{
+		TTF_CloseFont(font);
+	}
+}
+TTF_Font* get_font(font_type type)
+{
+	return fonts[type];
+}
+};

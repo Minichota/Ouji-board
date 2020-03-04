@@ -13,11 +13,11 @@ VPATH=$(SRC_DIR) $(addprefix $(SRC)/,$(cppdirs))
 
 CXX_FLAGS=$(addprefix -I, $(H_FILES)) `sdl2-config --libs --cflags` -O3 -Wall -lSDL2_image -lm -std=c++17 -lSDL2_ttf -lutil -pthread -ggdb
 
-all: $(O_DIR)/$(PROGRAM_NAME) | run
+all: $(PROGRAM_NAME) | run
 
-compile: $(O_DIR)/$(PROGRAM_NAME)
+compile: $(PROGRAM_NAME)
 
-$(O_DIR)/$(PROGRAM_NAME): $(OBJ_FILES)
+$(PROGRAM_NAME): $(OBJ_FILES)
 	$(CXX) -o $@ $^ $(CXX_FLAGS) $(external_files)
 
 $(O_DIR)/%.o: %.cpp | $(addprefix $(O_DIR)/,$(cpp_dirs))
@@ -31,5 +31,5 @@ $(addprefix $(O_DIR)/,$(cpp_dirs)):
 clean:
 	rm -rf $(O_DIR)
 
-run: $(O_DIR)/$(PROGRAM_NAME)
-	$<
+run: $(PROGRAM_NAME)
+	./$<
