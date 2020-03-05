@@ -44,7 +44,7 @@ void Instance::render()
 	{
 		SDL_SetRenderDrawColor(SDL::renderer, 255, 0, 255, 255);
 	}
-	SDL_Rect rect = { pos.x, pos.y, render_size.x, render_size.y };
+	SDL_Rect rect = { pos.x, pos.y, size.x, size.y };
 	SDL_RenderFillRect(SDL::renderer, &rect);
 }
 

@@ -72,7 +72,7 @@ void Editor::render()
 		// a new blank texture
 		SDL_Texture* render_complete = SDL_CreateTexture(
 			SDL::renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-			render_size.x - border_size * 2, render_size.y - border_size * 2);
+			render_size.x, render_size.y);
 
 		// setting to draw to blank texture
 		SDL_SetRenderTarget(SDL::renderer, render_complete);
