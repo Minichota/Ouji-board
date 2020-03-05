@@ -15,7 +15,7 @@ Instance::Instance(Ivec pos, Ivec size, short border_size)
 
 Instance::~Instance()
 {
-	thread.join();
+	this->thread.join();
 }
 
 void Instance::thread_update()

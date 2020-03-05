@@ -36,29 +36,29 @@ class Vector
 
 	Vector<T> operator/(const int& other)
 	{
-		return Vector<T>(this->x / other, this->y / other);
+		return Vector<T>(x / other, y / other);
 	}
 
 	template <class other_type>
 	Vector<T> operator/(const Vector<other_type>& other)
 	{
-		return Vector<T>(this->x / other.x, this->y / other.y);
+		return Vector<T>(x / other.x, y / other.y);
 	}
 
 	template <class other_type>
 	Vector<T> operator*(const Vector<other_type>& other)
 	{
-		return Vector<T>(this->x * other.x, this->y * other.y);
+		return Vector<T>(x * other.x, y * other.y);
 	}
 
 	Vector<T> operator*(const double other)
 	{
-		return Vector<T>(this->x * other, this->y * other);
+		return Vector<T>(x * other, y * other);
 	}
 
 	Vector<T> operator*(const float other)
 	{
-		return Vector<T>(this->x * other, this->y * other);
+		return Vector<T>(x * other, y * other);
 	}
 
 	template <class other_type>
@@ -72,19 +72,19 @@ class Vector
 	template <class other_type>
 	Vector<T> operator+(const Vector<other_type>& other)
 	{
-		return Vector<T>(this->x + other.x, this->y + other.y);
+		return Vector<T>(x + other.x, y + other.y);
 	}
 
 	Vector<T> operator+(const int other)
 	{
-		return Vector<T>(this->x + other, this->y + other);
+		return Vector<T>(x + other, y + other);
 	}
 
 	template <class other_type>
 	Vector<T>& operator-=(const Vector<other_type>& other)
 	{
-		this->x -= other.x;
-		this->y -= other.y;
+		x -= other.x;
+		y -= other.y;
 		return *this;
 	}
 
@@ -92,21 +92,21 @@ class Vector
 	Vector<T> operator-(const Vector<other_type>& rhs) const
 	{
 		Vector<T> ret;
-		ret.x = this->x - rhs.x;
-		ret.y = this->y - rhs.y;
+		ret.x = x - rhs.x;
+		ret.y = y - rhs.y;
 		return ret;
 	}
 
 	template <class other_type>
 	bool operator!=(const Vector<other_type>& other)
 	{
-		return this->x != other.x || this->y != other.y;
+		return x != other.x || y != other.y;
 	}
 
 	template <class other_type>
 	bool operator==(const Vector<other_type>& other)
 	{
-		return this->x == other.x && this->y == other.y;
+		return x == other.x && y == other.y;
 	}
 
 	T x;

@@ -6,13 +6,13 @@
 Editor::Editor(Ivec pos, Ivec size, short border_size) :
 Instance(pos, size, border_size)
 {
-	font = Resources::get_font(Resources::MONO);
+	this->font = Resources::get_font(Resources::MONO);
 	this->render_texture = nullptr;
 	this->changed = true;
 	this->row = 0;
 	this->col = 0;
 	SDL_StartTextInput();
-	scroll_chars = { 0, 0 };
+	this->scroll_chars = { 0, 0 };
 
 	read("res/test/test.txt");
 }
@@ -25,38 +25,39 @@ void Editor::update()
 {
 	while((int)row - scroll_chars.x >= num_cells.x - 1)
 	{
-		scroll_chars.x += 2;
-		changed = true;
+		this->scroll_chars.x += 2;
+		this->changed = true;
 	}
 	while((int)row - scroll_chars.x < 0)
 	{
-		scroll_chars.x -= 10;
+		this->scroll_chars.x -= 10;
 		if(scroll_chars.x < 0)
 		{
-			scroll_chars.x = 0;
+			this->scroll_chars.x = 0;
 			break;
 		}
-		changed = true;
+		this->changed = true;
 	}
 	while((int)col - scroll_chars.y >= num_cells.y - 1)
 	{
-		scroll_chars.y += 2;
-		changed = true;
+		this->scroll_chars.y += 2;
+		this->changed = true;
 	}
 	while((int)col - scroll_chars.y < 0)
 	{
-		scroll_chars.y -= 10;
+		this->scroll_chars.y -= 10;
 		if(scroll_chars.y < 0)
 		{
-			scroll_chars.y = 0;
+			this->scroll_chars.y = 0;
 			break;
 		}
-		changed = true;
+		this->changed = true;
 	}
 }
 
 void Editor::render()
 {
+	// rendering outline
 	Instance::render();
 	// rendering cursor
 
@@ -96,9 +97,9 @@ void Editor::render()
 			SDL_DestroyTexture(texture_part);
 		}
 		// assigning blank texture to classes texture and resetting renderer
-		render_texture = render_complete;
+		this->render_texture = render_complete;
 		SDL_SetRenderTarget(SDL::renderer, NULL);
-		changed = false;
+		this->changed = false;
 	}
 	if(render_texture != nullptr)
 	{
@@ -135,10 +136,10 @@ void Editor::process_event(const SDL_Event& event)
 			// normal text
 			for(char* c = (char*)event.text.text; *c != '\0'; c++)
 			{
-				this->text[col].insert(this->text[col].begin() + row, *c);
-				row++;
+				this->text[col].insert(text[col].begin() + row, *c);
+				this->row++;
 			}
-			changed = true;
+			this->changed = true;
 		}
 		break;
 		case SDL_KEYDOWN:
@@ -147,11 +148,11 @@ void Editor::process_event(const SDL_Event& event)
 			{
 				case SDLK_BACKSPACE:
 				{
-					if(this->text[col].size() > 0 && row != 0)
+					if(text[col].size() > 0 && row != 0)
 					{
 						// removal of single char
-						row--;
-						this->text[col].erase(this->text[col].begin() + row);
+						this->row--;
+						this->text[col].erase(text[col].begin() + row);
 					}
 					else if(col != 0)
 					{
@@ -163,10 +164,10 @@ void Editor::process_event(const SDL_Event& event)
 							std::string copy = text[col + 1];
 							text.erase(text.begin() + col + 1);
 							text[col].append(copy);
-							row = text[col].size() - copy.size();
+							this->row = text[col].size() - copy.size();
 						}
 					}
-					changed = true;
+					this->changed = true;
 				}
 				break;
 				case SDLK_RETURN:
@@ -174,20 +175,20 @@ void Editor::process_event(const SDL_Event& event)
 					const Uint8* keys = SDL_GetKeyboardState(NULL);
 					if(keys[SDL_SCANCODE_LSHIFT])
 					{
-						this->text.emplace(this->text.begin() + col);
-						changed = true;
-						row = 0;
+						this->text.emplace(text.begin() + col);
+						this->changed = true;
+						this->row = 0;
 					}
 					else
 					{
 						// inserts new line
-						std::string copy_to_end = this->text[col].substr(row);
-						this->text[col].erase(this->text[col].begin() + row,
-											  this->text[col].end());
-						col++;
-						row = 0;
-						changed = true;
-						this->text.emplace(this->text.begin() + col);
+						std::string copy_to_end = text[col].substr(row);
+						this->text[col].erase(text[col].begin() + row,
+											  text[col].end());
+						this->col++;
+						this->row = 0;
+						this->changed = true;
+						this->text.emplace(text.begin() + col);
 						this->text[col].append(copy_to_end);
 					}
 				}
@@ -200,10 +201,10 @@ void Editor::process_event(const SDL_Event& event)
 						// moves up one char
 						if(col != 0)
 						{
-							col--;
-							if(row > this->text[col].size())
+							this->col--;
+							if(row > text[col].size())
 							{
-								row = this->text[col].size();
+								this->row = text[col].size();
 							}
 						}
 					}
@@ -214,10 +215,10 @@ void Editor::process_event(const SDL_Event& event)
 					// moves up one char
 					if(col != 0)
 					{
-						col--;
-						if(row > this->text[col].size())
+						this->col--;
+						if(row > text[col].size())
 						{
-							row = this->text[col].size();
+							this->row = text[col].size();
 						}
 					}
 				}
@@ -228,14 +229,14 @@ void Editor::process_event(const SDL_Event& event)
 					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
 					{
 						// moves down one char
-						col++;
-						if(col > this->text.size() - 1)
+						this->col++;
+						if(col > text.size() - 1)
 						{
-							col = this->text.size() - 1;
+							this->col = text.size() - 1;
 						}
-						if(row > this->text[col].size())
+						if(row > text[col].size())
 						{
-							row = this->text[col].size();
+							this->row = text[col].size();
 						}
 					}
 				}
@@ -243,14 +244,14 @@ void Editor::process_event(const SDL_Event& event)
 				case SDLK_DOWN:
 				{
 					// moves down one char
-					col++;
-					if(col > this->text.size() - 1)
+					this->col++;
+					if(col > text.size() - 1)
 					{
-						col = this->text.size() - 1;
+						this->col = text.size() - 1;
 					}
-					if(row > this->text[col].size())
+					if(row > text[col].size())
 					{
-						row = this->text[col].size();
+						this->row = text[col].size();
 					}
 				}
 				break;
@@ -260,9 +261,9 @@ void Editor::process_event(const SDL_Event& event)
 					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
 					{
 						// moves right one char
-						if(row != this->text[col].size())
+						if(row != text[col].size())
 						{
-							row++;
+							this->row++;
 						}
 					}
 				}
@@ -270,9 +271,9 @@ void Editor::process_event(const SDL_Event& event)
 				case SDLK_RIGHT:
 				{
 					// moves right one char
-					if(row != this->text[col].size())
+					if(row != text[col].size())
 					{
-						row++;
+						this->row++;
 					}
 				}
 				break;
@@ -284,7 +285,7 @@ void Editor::process_event(const SDL_Event& event)
 						// moves left one char
 						if(row != 0)
 						{
-							row--;
+							this->row--;
 						}
 					}
 				}
@@ -294,7 +295,7 @@ void Editor::process_event(const SDL_Event& event)
 					// moves left one char
 					if(row != 0)
 					{
-						row--;
+						this->row--;
 					}
 				}
 				break;
@@ -312,14 +313,14 @@ void Editor::process_event(const SDL_Event& event)
 								{
 									if(col > 0)
 									{
-										col--;
-										row = text[col].size();
+										this->col--;
+										this->row = text[col].size();
 									}
 									break;
 								}
 								else
 								{
-									row--;
+									this->row--;
 								}
 							}
 						}
@@ -327,8 +328,8 @@ void Editor::process_event(const SDL_Event& event)
 						{
 							if(col > 0)
 							{
-								col--;
-								row = text[col].size();
+								this->col--;
+								this->row = text[col].size();
 							}
 						}
 					}
@@ -346,8 +347,8 @@ void Editor::process_event(const SDL_Event& event)
 							{
 								if(col + 1 < text.size())
 								{
-									col++;
-									row = 0;
+									this->col++;
+									this->row = 0;
 								}
 								break;
 							}
@@ -362,8 +363,8 @@ void Editor::process_event(const SDL_Event& event)
 				case SDLK_TAB:
 				{
 					this->text[col].insert(row, "    ");
-					row += 4;
-					changed = true;
+					this->row += 4;
+					this->changed = true;
 				}
 				break;
 				case SDLK_r:
@@ -373,7 +374,7 @@ void Editor::process_event(const SDL_Event& event)
 					if(keys[SDL_SCANCODE_LCTRL])
 					{
 						read(std::string("res/test/test.txt"));
-						changed = true;
+						this->changed = true;
 					}
 				}
 				break;
@@ -409,7 +410,7 @@ void Editor::save(std::string path)
 	ofstream.open(path);
 	if(ofstream.is_open())
 	{
-		for(std::string line : this->text)
+		for(std::string line : text)
 		{
 			ofstream << line << '\n';
 		}
