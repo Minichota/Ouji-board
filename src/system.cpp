@@ -30,6 +30,7 @@ void load_sdl()
 							  SDL_WINDOWPOS_CENTERED, window_size.x,
 							  window_size.y, SDL_WINDOW_RESIZABLE);
 	renderer = SDL_CreateRenderer(window, -1, 0);
+	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 }
 
 void clear_sdl()
