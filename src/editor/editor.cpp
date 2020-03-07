@@ -129,6 +129,7 @@ void Editor::render()
 
 void Editor::process_event(const SDL_Event& event)
 {
+	const Uint8* keys = SDL_GetKeyboardState(NULL);
 	switch(event.type)
 	{
 		case SDL_TEXTINPUT:
@@ -172,7 +173,6 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_RETURN:
 				{
-					const Uint8* keys = SDL_GetKeyboardState(NULL);
 					if(keys[SDL_SCANCODE_LSHIFT])
 					{
 						this->text.emplace(text.begin() + col);
@@ -195,7 +195,6 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_k:
 				{
-					const Uint8* keys = SDL_GetKeyboardState(NULL);
 					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
 					{
 						// moves up one char
@@ -225,7 +224,6 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_j:
 				{
-					const Uint8* keys = SDL_GetKeyboardState(NULL);
 					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
 					{
 						// moves down one char
@@ -257,7 +255,6 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_l:
 				{
-					const Uint8* keys = SDL_GetKeyboardState(NULL);
 					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
 					{
 						// moves right one char
@@ -279,7 +276,6 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_h:
 				{
-					const Uint8* keys = SDL_GetKeyboardState(NULL);
 					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
 					{
 						// moves left one char
@@ -301,7 +297,6 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_b:
 				{
-					const Uint8* keys = SDL_GetKeyboardState(NULL);
 					if(keys[SDL_SCANCODE_LCTRL])
 					{
 						if(row != 0)
@@ -337,7 +332,6 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_n:
 				{
-					const Uint8* keys = SDL_GetKeyboardState(NULL);
 					if(keys[SDL_SCANCODE_LCTRL])
 					{
 						for(char* c = &text[col][row]; *c != ' ';
@@ -369,7 +363,6 @@ void Editor::process_event(const SDL_Event& event)
 				break;
 				case SDLK_d:
 				{
-					const uint8_t* keys = SDL_GetKeyboardState(NULL);
 					if(keys[SDL_SCANCODE_LCTRL])
 					{
 						for(; text[col][row] != ' ' && row < text[col].size();)
@@ -387,7 +380,6 @@ void Editor::process_event(const SDL_Event& event)
 				case SDLK_r:
 				{
 					// reload
-					const uint8_t* keys = SDL_GetKeyboardState(NULL);
 					if(keys[SDL_SCANCODE_LCTRL])
 					{
 						read(std::string("res/test/test.txt"));
