@@ -366,6 +366,23 @@ void Editor::process_event(const SDL_Event& event)
 					changed = true;
 				}
 				break;
+				case SDLK_d:
+				{
+					const uint8_t* keys = SDL_GetKeyboardState(NULL);
+					if(keys[SDL_SCANCODE_LCTRL])
+					{
+						for(; text[col][row] != ' ' && row < text[col].size();)
+						{
+							text[col].erase(text[col].begin() + row);
+						}
+						if(text[col][row] == ' ')
+						{
+							text[col].erase(text[col].begin() + row);
+						}
+						changed = true;
+					}
+				}
+				break;
 				case SDLK_r:
 				{
 					// reload
