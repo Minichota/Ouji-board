@@ -129,270 +129,289 @@ void Editor::render()
 
 void Editor::process_event(const SDL_Event& event)
 {
-	const Uint8* keys = SDL_GetKeyboardState(NULL);
-	switch(event.type)
+	switch(Instance::state)
 	{
-		case SDL_TEXTINPUT:
+		case NORMAL:
 		{
-			// normal text
-			for(char* c = (char*)event.text.text; *c != '\0'; c++)
+			const Uint8* keys = SDL_GetKeyboardState(NULL);
+			switch(event.type)
 			{
-				this->text[col].insert(text[col].begin() + row, *c);
-				this->row++;
-			}
-			this->changed = true;
-		}
-		break;
-		case SDL_KEYDOWN:
-		{
-			switch(event.key.keysym.sym)
-			{
-				case SDLK_BACKSPACE:
+				case SDL_TEXTINPUT:
 				{
-					if(text[col].size() > 0 && row != 0)
+					// normal text
+					for(char* c = (char*)event.text.text; *c != '\0'; c++)
 					{
-						// removal of single char
-						this->row--;
-						this->text[col].erase(text[col].begin() + row);
-					}
-					else if(col != 0)
-					{
-						// removal of newline char
-						// new line gets moved to end of prev line
-						this->col--;
-						if(text[col + 1].size() != 0)
-						{
-							std::string copy = text[col + 1];
-							text.erase(text.begin() + col + 1);
-							text[col].append(copy);
-							this->row = text[col].size() - copy.size();
-						}
+						this->text[col].insert(text[col].begin() + row, *c);
+						this->row++;
 					}
 					this->changed = true;
 				}
 				break;
-				case SDLK_RETURN:
+				case SDL_KEYDOWN:
 				{
-					if(keys[SDL_SCANCODE_LSHIFT])
+					SDL_StartTextInput();
+					switch(event.key.keysym.sym)
 					{
-						this->text.emplace(text.begin() + col);
-						this->changed = true;
-						this->row = 0;
-					}
-					else
-					{
-						// inserts new line
-						std::string copy_to_end = text[col].substr(row);
-						this->text[col].erase(text[col].begin() + row,
-											  text[col].end());
-						this->col++;
-						this->row = 0;
-						this->changed = true;
-						this->text.emplace(text.begin() + col);
-						this->text[col].append(copy_to_end);
-					}
-				}
-				break;
-				case SDLK_k:
-				{
-					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
-					{
-						// moves up one char
-						if(col != 0)
+						case SDLK_BACKSPACE:
 						{
-							this->col--;
+							if(text[col].size() > 0 && row != 0)
+							{
+								// removal of single char
+								this->row--;
+								this->text[col].erase(text[col].begin() + row);
+							}
+							else if(col != 0)
+							{
+								// removal of newline char
+								// new line gets moved to end of prev line
+								this->col--;
+								if(text[col + 1].size() != 0)
+								{
+									std::string copy = text[col + 1];
+									text.erase(text.begin() + col + 1);
+									text[col].append(copy);
+									this->row = text[col].size() - copy.size();
+								}
+							}
+							this->changed = true;
+						}
+						break;
+						case SDLK_RETURN:
+						{
+							if(keys[SDL_SCANCODE_LSHIFT])
+							{
+								this->text.emplace(text.begin() + col);
+								this->changed = true;
+								this->row = 0;
+							}
+							else
+							{
+								// inserts new line
+								std::string copy_to_end = text[col].substr(row);
+								this->text[col].erase(text[col].begin() + row,
+													  text[col].end());
+								this->col++;
+								this->row = 0;
+								this->changed = true;
+								this->text.emplace(text.begin() + col);
+								this->text[col].append(copy_to_end);
+							}
+						}
+						break;
+						case SDLK_k:
+						{
+							if(keys[SDL_SCANCODE_LCTRL] &&
+							   !keys[SDL_SCANCODE_LSHIFT])
+							{
+								// moves up one char
+								if(col != 0)
+								{
+									this->col--;
+									if(row > text[col].size())
+									{
+										this->row = text[col].size();
+									}
+								}
+							}
+						}
+						break;
+						case SDLK_UP:
+						{
+							// moves up one char
+							if(col != 0)
+							{
+								this->col--;
+								if(row > text[col].size())
+								{
+									this->row = text[col].size();
+								}
+							}
+						}
+						break;
+						case SDLK_j:
+						{
+							if(keys[SDL_SCANCODE_LCTRL] &&
+							   !keys[SDL_SCANCODE_LSHIFT])
+							{
+								// moves down one char
+								this->col++;
+								if(col > text.size() - 1)
+								{
+									this->col = text.size() - 1;
+								}
+								if(row > text[col].size())
+								{
+									this->row = text[col].size();
+								}
+							}
+						}
+						break;
+						case SDLK_DOWN:
+						{
+							// moves down one char
+							this->col++;
+							if(col > text.size() - 1)
+							{
+								this->col = text.size() - 1;
+							}
 							if(row > text[col].size())
 							{
 								this->row = text[col].size();
 							}
 						}
-					}
-				}
-				break;
-				case SDLK_UP:
-				{
-					// moves up one char
-					if(col != 0)
-					{
-						this->col--;
-						if(row > text[col].size())
+						break;
+						case SDLK_l:
 						{
-							this->row = text[col].size();
-						}
-					}
-				}
-				break;
-				case SDLK_j:
-				{
-					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
-					{
-						// moves down one char
-						this->col++;
-						if(col > text.size() - 1)
-						{
-							this->col = text.size() - 1;
-						}
-						if(row > text[col].size())
-						{
-							this->row = text[col].size();
-						}
-					}
-				}
-				break;
-				case SDLK_DOWN:
-				{
-					// moves down one char
-					this->col++;
-					if(col > text.size() - 1)
-					{
-						this->col = text.size() - 1;
-					}
-					if(row > text[col].size())
-					{
-						this->row = text[col].size();
-					}
-				}
-				break;
-				case SDLK_l:
-				{
-					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
-					{
-						// moves right one char
-						if(row != text[col].size())
-						{
-							this->row++;
-						}
-					}
-				}
-				break;
-				case SDLK_RIGHT:
-				{
-					// moves right one char
-					if(row != text[col].size())
-					{
-						this->row++;
-					}
-				}
-				break;
-				case SDLK_h:
-				{
-					if(keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_LSHIFT])
-					{
-						// moves left one char
-						if(row != 0)
-						{
-							this->row--;
-						}
-					}
-				}
-				break;
-				case SDLK_LEFT:
-				{
-					// moves left one char
-					if(row != 0)
-					{
-						this->row--;
-					}
-				}
-				break;
-				case SDLK_b:
-				{
-					if(keys[SDL_SCANCODE_LCTRL])
-					{
-						if(row != 0)
-						{
-							for(char* c = &text[col][row]; *c != ' ';
-								c = &text[col][row + 1])
+							if(keys[SDL_SCANCODE_LCTRL] &&
+							   !keys[SDL_SCANCODE_LSHIFT])
 							{
-								if(row == 0)
+								// moves right one char
+								if(row != text[col].size())
+								{
+									this->row++;
+								}
+							}
+						}
+						break;
+						case SDLK_RIGHT:
+						{
+							// moves right one char
+							if(row != text[col].size())
+							{
+								this->row++;
+							}
+						}
+						break;
+						case SDLK_h:
+						{
+							if(keys[SDL_SCANCODE_LCTRL] &&
+							   !keys[SDL_SCANCODE_LSHIFT])
+							{
+								// moves left one char
+								if(row != 0)
+								{
+									this->row--;
+								}
+							}
+						}
+						break;
+						case SDLK_LEFT:
+						{
+							// moves left one char
+							if(row != 0)
+							{
+								this->row--;
+							}
+						}
+						break;
+						case SDLK_b:
+						{
+							if(keys[SDL_SCANCODE_LCTRL])
+							{
+								if(row != 0)
+								{
+									for(char* c = &text[col][row]; *c != ' ';
+										c = &text[col][row + 1])
+									{
+										if(row == 0)
+										{
+											if(col > 0)
+											{
+												this->col--;
+												this->row = text[col].size();
+											}
+											break;
+										}
+										else
+										{
+											this->row--;
+										}
+									}
+								}
+								else
 								{
 									if(col > 0)
 									{
 										this->col--;
 										this->row = text[col].size();
 									}
-									break;
 								}
-								else
+							}
+						}
+						break;
+						case SDLK_n:
+						{
+							if(keys[SDL_SCANCODE_LCTRL])
+							{
+								for(char* c = &text[col][row]; *c != ' ';
+									c = &text[col][row - 1])
 								{
-									this->row--;
+									if(row == text[col].size())
+									{
+										if(col + 1 < text.size())
+										{
+											this->col++;
+											this->row = 0;
+										}
+										break;
+									}
+									else
+									{
+										row++;
+									}
 								}
 							}
 						}
-						else
+						break;
+						case SDLK_TAB:
 						{
-							if(col > 0)
-							{
-								this->col--;
-								this->row = text[col].size();
-							}
+							this->text[col].insert(row, "    ");
+							this->row += 4;
+							this->changed = true;
 						}
-					}
-				}
-				break;
-				case SDLK_n:
-				{
-					if(keys[SDL_SCANCODE_LCTRL])
-					{
-						for(char* c = &text[col][row]; *c != ' ';
-							c = &text[col][row - 1])
+						break;
+						case SDLK_d:
 						{
-							if(row == text[col].size())
+							if(keys[SDL_SCANCODE_LCTRL])
 							{
-								if(col + 1 < text.size())
+								for(; text[col][row] != ' ' &&
+									  row < text[col].size();)
 								{
-									this->col++;
-									this->row = 0;
+									text[col].erase(text[col].begin() + row);
 								}
-								break;
+								if(text[col][row] == ' ')
+								{
+									text[col].erase(text[col].begin() + row);
+								}
+								changed = true;
 							}
-							else
+						}
+						break;
+						case SDLK_r:
+						{
+							// reload
+							if(keys[SDL_SCANCODE_LCTRL])
 							{
-								row++;
+								read(std::string("res/test/test.txt"));
+								this->changed = true;
 							}
 						}
-					}
-				}
-				break;
-				case SDLK_TAB:
-				{
-					this->text[col].insert(row, "    ");
-					this->row += 4;
-					this->changed = true;
-				}
-				break;
-				case SDLK_d:
-				{
-					if(keys[SDL_SCANCODE_LCTRL])
-					{
-						for(; text[col][row] != ' ' && row < text[col].size();)
+						break;
+						case SDLK_F4:
 						{
-							text[col].erase(text[col].begin() + row);
+							save(std::string("res/test/test.txt"));
 						}
-						if(text[col][row] == ' ')
-						{
-							text[col].erase(text[col].begin() + row);
-						}
-						changed = true;
+						break;
 					}
-				}
-				break;
-				case SDLK_r:
-				{
-					// reload
-					if(keys[SDL_SCANCODE_LCTRL])
-					{
-						read(std::string("res/test/test.txt"));
-						this->changed = true;
-					}
-				}
-				break;
-				case SDLK_F4:
-				{
-					save(std::string("res/test/test.txt"));
 				}
 				break;
 			}
+			break;
+		}
+		break;
+		case COMMAND:
+		{
+			SDL_StopTextInput();
 		}
 		break;
 	}

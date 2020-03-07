@@ -5,6 +5,12 @@
 
 #include "vectors.hpp"
 
+enum State
+{
+	NORMAL,
+	COMMAND,
+};
+
 class Instance
 {
 	public:
@@ -19,6 +25,8 @@ class Instance
 	bool collides(Ivec m_pos);
 
 	bool active;
+
+	static State state;
 
 	protected:
 	Ivec pos;

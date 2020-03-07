@@ -30,7 +30,7 @@ int main()
 {
 	load_sdl();
 	load_res();
-	Ivec instance_size = { window_size.x / 2, window_size.y / 2 };
+	Ivec instance_size = { window_size.x / 2, window_size.y };
 	Editor win = Editor(Ivec(0, 0), instance_size, 5);
 	Editor win2 = Editor(Ivec(instance_size.x, 0), instance_size, 5);
 	instances.push_back(&win);

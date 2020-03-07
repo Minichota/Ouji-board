@@ -25,8 +25,7 @@ void handle_events(const SDL_Event& event)
 			{
 				case SDLK_j:
 				{
-					const uint8_t* keys = SDL_GetKeyboardState(NULL);
-					if(keys[SDL_SCANCODE_LSHIFT] && keys[SDL_SCANCODE_LCTRL])
+					if(Instance::state == COMMAND)
 					{
 						instances[current_instance]->active = false;
 						current_instance--;
@@ -35,13 +34,13 @@ void handle_events(const SDL_Event& event)
 							current_instance = instances.size() - 1;
 						}
 						instances[current_instance]->active = true;
+						Instance::state = NORMAL;
 					}
 				}
 				break;
 				case SDLK_k:
 				{
-					const uint8_t* keys = SDL_GetKeyboardState(NULL);
-					if(keys[SDL_SCANCODE_LSHIFT] && keys[SDL_SCANCODE_LCTRL])
+					if(Instance::state == COMMAND)
 					{
 						instances[current_instance]->active = false;
 						current_instance++;
@@ -50,6 +49,16 @@ void handle_events(const SDL_Event& event)
 							current_instance = 0;
 						}
 						instances[current_instance]->active = true;
+						Instance::state = NORMAL;
+					}
+				}
+				break;
+				case SDLK_SPACE:
+				{
+					const uint8_t* keys = SDL_GetKeyboardState(NULL);
+					if(keys[SDL_SCANCODE_LCTRL])
+					{
+						Instance::state = COMMAND;
 					}
 				}
 				break;

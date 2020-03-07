@@ -3,6 +3,7 @@
 #include "instance.hpp"
 #include "system.hpp"
 
+State Instance::state = NORMAL;
 Instance::Instance(Ivec pos, Ivec size, short border_size)
 {
 	this->pos = pos;
