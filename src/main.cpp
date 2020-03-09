@@ -3,6 +3,7 @@
 #include "editor.hpp"
 #include "instance-control.hpp"
 #include "system.hpp"
+#include "tty.hpp"
 #include "vectors.hpp"
 
 using namespace SDL;
@@ -43,6 +44,8 @@ int main()
 		Resources::cache_text(Resources::create_text("NORMAL MODE", MONO));
 	size_t command_cache =
 		Resources::cache_text(Resources::create_text("COMMAND MODE", MONO));
+
+	send_command("echo wow");
 
 	while(true)
 	{
