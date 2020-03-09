@@ -46,6 +46,29 @@ namespace Resources
 {
 std::vector<TTF_Font*> fonts;
 std::vector<std::string> font_paths = { "res/font/RobotoMono-Regular.ttf" };
+std::vector<SDL_Texture*> text_cache;
+
+size_t cache_text(SDL_Texture* text)
+{
+	text_cache.push_back(text);
+	return text_cache.size() - 1;
+}
+
+SDL_Texture* load_cache_text(size_t pos)
+{
+	return text_cache[pos];
+}
+
+SDL_Texture* create_text(std::string text, font_type font)
+{
+	SDL_Surface* surface =
+		TTF_RenderText_Blended(Resources::get_font(font), text.c_str(),
+							   SDL_Color{ 255, 255, 255, 255 });
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(SDL::renderer, surface);
+	SDL_FreeSurface(surface);
+	return texture;
+}
+
 void load_res()
 {
 	for(std::string font_path : font_paths)
@@ -58,6 +81,10 @@ void clear_res()
 	for(TTF_Font* font : fonts)
 	{
 		TTF_CloseFont(font);
+	}
+	for(SDL_Texture* cache : text_cache)
+	{
+		SDL_DestroyTexture(cache);
 	}
 }
 TTF_Font* get_font(font_type type)

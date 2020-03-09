@@ -38,6 +38,12 @@ int main()
 
 	current_instance = 0;
 	instances[current_instance]->active = true;
+
+	size_t normal_cache =
+		Resources::cache_text(Resources::create_text("NORMAL MODE", MONO));
+	size_t command_cache =
+		Resources::cache_text(Resources::create_text("COMMAND MODE", MONO));
+
 	while(true)
 	{
 		process_events();
@@ -48,6 +54,27 @@ int main()
 		{
 			instances[i]->render();
 		}
+
+		/* rendering of current_state to corner of screen */
+		SDL_Texture* texture = nullptr;
+		switch(Instance::state)
+		{
+			case NORMAL:
+			{
+				texture = Resources::load_cache_text(normal_cache);
+			}
+			break;
+			case COMMAND:
+			{
+				texture = Resources::load_cache_text(command_cache);
+			}
+			break;
+		}
+		SDL_Rect dest_rect;
+		SDL_QueryTexture(texture, nullptr, nullptr, &dest_rect.w, &dest_rect.h);
+		dest_rect.x = 0;
+		dest_rect.y = window_size.y - dest_rect.h;
+		SDL_RenderCopy(renderer, texture, nullptr, &dest_rect);
 
 		SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
 		/* render */

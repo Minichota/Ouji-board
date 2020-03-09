@@ -24,12 +24,16 @@ namespace Resources
 {
 extern std::vector<TTF_Font*> fonts;
 extern std::vector<std::string> font_paths;
+extern std::vector<SDL_Texture*> text_cache;
+size_t cache_text(SDL_Texture* text);
+SDL_Texture* load_cache_text(size_t pos);
 void load_res();
 void clear_res();
 enum font_type
 {
 	MONO = 0
 };
+SDL_Texture* create_text(std::string text, font_type font);
 TTF_Font* get_font(font_type type);
 };
 
