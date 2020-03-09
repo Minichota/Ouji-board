@@ -387,21 +387,6 @@ void Editor::process_event(const SDL_Event& event)
 							}
 						}
 						break;
-						case SDLK_r:
-						{
-							// reload
-							if(keys[SDL_SCANCODE_LCTRL])
-							{
-								read(std::string("res/test/test.txt"));
-								this->changed = true;
-							}
-						}
-						break;
-						case SDLK_F4:
-						{
-							save(std::string("res/test/test.txt"));
-						}
-						break;
 					}
 				}
 				break;
@@ -412,6 +397,24 @@ void Editor::process_event(const SDL_Event& event)
 		case COMMAND:
 		{
 			SDL_StopTextInput();
+			switch(event.key.keysym.sym)
+			{
+				case SDLK_r:
+				{
+					// reload
+					read(std::string("res/test/test.txt"));
+					this->changed = true;
+					Instance::state = NORMAL;
+				}
+				break;
+				case SDLK_s:
+				{
+					// save file
+					save(std::string("res/test/test.txt"));
+					Instance::state = NORMAL;
+				}
+				break;
+			}
 		}
 		break;
 	}
