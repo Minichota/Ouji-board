@@ -91,8 +91,8 @@ int main()
 		SDL_Delay(1000.0f / 144.0f);
 	}
 
-	clear_sdl();
 	clear_res();
+	clear_sdl();
 	stop_tty();
 	return 0;
 }
