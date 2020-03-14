@@ -3,13 +3,14 @@
 #include "editor.hpp"
 #include "instance-control.hpp"
 #include "system.hpp"
+#include "terminal.hpp"
 #include "tty.hpp"
 #include "vectors.hpp"
 
 using namespace SDL;
 using namespace Resources;
 
-static void process_events()
+static bool process_events()
 {
 	SDL_Event event;
 	while(SDL_PollEvent(&event))
@@ -18,7 +19,7 @@ static void process_events()
 		{
 			case SDL_QUIT:
 			{
-				exit(0);
+				return false;
 			}
 			break;
 		}
@@ -26,6 +27,7 @@ static void process_events()
 
 		instances[current_instance]->process_event(event);
 	}
+	return true;
 }
 int main()
 {
@@ -33,7 +35,7 @@ int main()
 	load_res();
 	Ivec instance_size = { window_size.x / 2, window_size.y };
 	Editor win = Editor(Ivec(0, 0), instance_size, 5);
-	Editor win2 = Editor(Ivec(instance_size.x, 0), instance_size, 5);
+	Terminal win2 = Terminal(Ivec(instance_size.x, 0), instance_size, 5);
 	instances.push_back(&win);
 	instances.push_back(&win2);
 
@@ -45,11 +47,14 @@ int main()
 	size_t command_cache =
 		Resources::cache_text(Resources::create_text("COMMAND MODE", MONO));
 
-	send_command("echo wow");
+	start_tty();
 
 	while(true)
 	{
-		process_events();
+		if(!process_events())
+		{
+			break;
+		}
 
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
@@ -88,5 +93,6 @@ int main()
 
 	clear_sdl();
 	clear_res();
+	stop_tty();
 	return 0;
 }

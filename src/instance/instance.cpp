@@ -16,12 +16,13 @@ Instance::Instance(Ivec pos, Ivec size, short border_size)
 
 Instance::~Instance()
 {
+	this->continue_thread = false;
 	this->thread.join();
 }
 
 void Instance::thread_update()
 {
-	while(true)
+	while(true && continue_thread)
 	{
 		if(active)
 		{

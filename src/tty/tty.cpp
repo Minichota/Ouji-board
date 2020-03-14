@@ -1,16 +1,37 @@
 #include "tty.hpp"
 
+#include <atomic>
 #include <cassert>
 #include <csignal>
+#include <cstring>
 #include <iostream>
 #include <ostream>
 #include <stdio.h>
 #include <sys/select.h>
 #include <sys/time.h>
+#include <thread>
 #include <unistd.h>
 
-void send_command(std::string command)
+static std::string out;
+std::atomic<char*> command;
+static bool active = true;
+
+void set_command(std::string comm)
 {
+	strcpy(command.load(), comm.c_str());
+}
+
+std::string read_command()
+{
+	std::string out_copy = out;
+	out.clear();
+	return out_copy;
+}
+
+void tty_loop()
+{
+	command = (char*)malloc(1024);
+
 	int pipe_to_sh[2];
 	int pipe_to_te[2];
 	int pipe_to_te_error[2];
@@ -31,47 +52,56 @@ void send_command(std::string command)
 
 	if(pid != 0)
 	{
-		write(pipe_to_sh[1], command.c_str(), command.size());
-		write(pipe_to_sh[1], "\n", 1);
-
-		// parent
-		char c;
-		fd_set rfd;
-		fd_set wfd;
-		fd_set efd;
-		timeval tv;
-
-		// exit
-		do
+		while(active)
 		{
-			FD_ZERO(&rfd);
-			FD_ZERO(&wfd);
-			FD_ZERO(&efd);
-			FD_SET(pipe_to_te[0], &rfd);
-			FD_SET(pipe_to_te_error[0], &rfd);
-			tv.tv_sec = 0;
-			tv.tv_usec = 100000;
-			select(100, &rfd, &wfd, &efd, &tv);
-
-			if(FD_ISSET(pipe_to_te[0], &rfd))
+			// std::cout << "command: " << command.load() << std::endl;
+			if(*command.load() != '\0')
 			{
-				read(pipe_to_te[0], &c, 1);
-				std::cout << c << std::flush;
-			}
+				write(pipe_to_sh[1], command.load(), strlen(command.load()));
+				write(pipe_to_sh[1], "\n", 1);
 
-			// Check for data on the STDERR pipe; the
-			// executed console will write error messages
-			// on this pipe (for instance the error message
-			// that results from typing an unexisting command.
-			// Just for display purposes, the STDERR messages
-			// will be shown in upper case.
-			if(FD_ISSET(pipe_to_te_error[0], &rfd))
-			{
-				read(pipe_to_te_error[0], &c, 1);
-				std::cout << (char)toupper(c) << std::flush;
+				memset(command.load(), 0, 1024);
+
+				// parent
+				char c;
+				fd_set rfd;
+				fd_set wfd;
+				fd_set efd;
+				timeval tv;
+
+				// exit
+				do
+				{
+					FD_ZERO(&rfd);
+					FD_ZERO(&wfd);
+					FD_ZERO(&efd);
+					FD_SET(pipe_to_te[0], &rfd);
+					FD_SET(pipe_to_te_error[0], &rfd);
+					tv.tv_sec = 0;
+					tv.tv_usec = 100000;
+					select(100, &rfd, &wfd, &efd, &tv);
+
+					if(FD_ISSET(pipe_to_te[0], &rfd))
+					{
+						read(pipe_to_te[0], &c, 1);
+						out.push_back(c);
+					}
+
+					// Check for data on the STDERR pipe; the
+					// executed console will write error messages
+					// on this pipe (for instance the error message
+					// that results from typing an unexisting command.
+					// Just for display purposes, the STDERR messages
+					// will be shown in upper case.
+					if(FD_ISSET(pipe_to_te_error[0], &rfd))
+					{
+						read(pipe_to_te_error[0], &c, 1);
+						out.push_back(c);
+					}
+				} while(FD_ISSET(pipe_to_te[0], &rfd) ||
+						FD_ISSET(pipe_to_te_error[0], &rfd));
 			}
-		} while(FD_ISSET(pipe_to_te[0], &rfd) ||
-				FD_ISSET(pipe_to_te_error[0], &rfd));
+		}
 		kill(pid, SIGKILL);
 	}
 	else
@@ -86,9 +116,18 @@ void send_command(std::string command)
 		assert(dup2(pipe_to_te_error[1], 2) == 2);
 		execlp("zsh", "/bin/zsh", NULL);
 	}
+	free(command);
 }
 
-std::string read_command()
+std::thread tty_thread;
+
+void start_tty()
 {
-	return "";
+	tty_thread = std::thread(&tty_loop);
+}
+
+void stop_tty()
+{
+	active = false;
+	tty_thread.join();
 }

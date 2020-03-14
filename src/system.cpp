@@ -78,10 +78,6 @@ void load_res()
 }
 void clear_res()
 {
-	for(TTF_Font* font : fonts)
-	{
-		TTF_CloseFont(font);
-	}
 	for(SDL_Texture* cache : text_cache)
 	{
 		SDL_DestroyTexture(cache);

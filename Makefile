@@ -2,7 +2,7 @@ PROGRAM_NAME=ouji_board
 SRC_DIR=src
 O_DIR=obj
 CXX=g++
-cpp_dirs=math instance editor tty
+cpp_dirs=math instance editor tty terminal
 SRC=src
 
 SRC_FILES= $(wildcard $(SRC)/*.cpp $(addsuffix /*.cpp,$(addprefix $(SRC)/,$(cpp_dirs))))

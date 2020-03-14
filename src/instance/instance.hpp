@@ -1,6 +1,7 @@
 #ifndef INSTANCE_HPP
 #define INSTANCE_HPP
 
+#include <SDL2/SDL.h>
 #include <thread>
 
 #include "vectors.hpp"
@@ -36,6 +37,7 @@ class Instance
 
 	private:
 	std::thread thread;
+	bool continue_thread = true;
 };
 
 #endif
