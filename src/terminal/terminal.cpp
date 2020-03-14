@@ -137,6 +137,7 @@ void Terminal::process_event(const SDL_Event& event)
 		break;
 		case COMMAND:
 		{
+			SDL_StopTextInput();
 		}
 		break;
 	}
