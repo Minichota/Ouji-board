@@ -45,6 +45,7 @@ void Terminal::update()
 	if(!tty_out.empty())
 	{
 		std::vector<std::string> output = split_string(tty_out, "\n");
+		output.pop_back();
 		for(std::string s : output)
 		{
 			this->text.push_back(s);
@@ -118,6 +119,7 @@ void Terminal::process_event(const SDL_Event& event)
 						case SDLK_RETURN:
 						{
 							set_command(text[0]);
+							this->text[0].clear();
 						}
 						break;
 						case SDLK_BACKSPACE:
