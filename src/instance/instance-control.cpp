@@ -62,6 +62,11 @@ void handle_events(const SDL_Event& event)
 					}
 				}
 				break;
+				case SDLK_ESCAPE:
+				{
+					Instance::state = NORMAL;
+				}
+				break;
 			}
 		}
 	}

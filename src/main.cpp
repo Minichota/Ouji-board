@@ -84,8 +84,9 @@ int main()
 		}
 		SDL_Rect dest_rect;
 		SDL_QueryTexture(texture, nullptr, nullptr, &dest_rect.w, &dest_rect.h);
-		dest_rect.x = 0;
-		dest_rect.y = window_size.y - dest_rect.h;
+		constexpr int CORNER_OFFSET = 5;
+		dest_rect.x = CORNER_OFFSET;
+		dest_rect.y = window_size.y - dest_rect.h - CORNER_OFFSET;
 		SDL_RenderCopy(renderer, texture, nullptr, &dest_rect);
 
 		SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
