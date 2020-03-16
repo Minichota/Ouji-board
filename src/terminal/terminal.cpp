@@ -56,7 +56,18 @@ void Terminal::update()
 		for(std::string s : output)
 		{
 			this->text.push_back(s);
+
+			constexpr char ESC = (char)27;
+			std::string clear_seq = std::string() + ESC + "[H" + ESC + "[2J";
+
+			if(s == clear_seq)
+			{
+				// flush terminal
+				this->text.clear();
+				this->text.emplace_back();
+			}
 		}
+		this->text[0].clear();
 		this->changed = true;
 	}
 }
@@ -150,6 +161,16 @@ void Terminal::process_event(const SDL_Event& event)
 							{
 								this->changed = true;
 								this->text[0].pop_back();
+							}
+						}
+						break;
+						case SDLK_c:
+						{
+							const uint8_t* keys = SDL_GetKeyboardState(NULL);
+							if(keys[SDL_SCANCODE_LCTRL])
+							{
+								this->text[0].clear();
+								this->changed = true;
 							}
 						}
 						break;
