@@ -15,7 +15,8 @@ enum State
 class Instance
 {
 	public:
-	Instance(Ivec pos, Ivec size, short border_size);
+	Instance(Ivec pos, Ivec size, short border_size,
+			 SDL_Color border_color = { 255, 255, 255, 255 });
 	~Instance();
 	void thread_update();
 	virtual void update();
@@ -33,6 +34,7 @@ class Instance
 	Ivec pos;
 	Ivec size;
 	short border_size;
+	SDL_Color border_color;
 	Ivec render_size;
 
 	private:

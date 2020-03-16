@@ -9,7 +9,8 @@
 class Terminal : public Instance
 {
 	public:
-	Terminal(Ivec pos, Ivec size, short border_size);
+	Terminal(Ivec pos, Ivec size, short border_size, SDL_Color border_color,
+			 SDL_Color font_color);
 	~Terminal();
 
 	void update() override;
@@ -23,6 +24,7 @@ class Terminal : public Instance
 	Ivec glyph_size;
 
 	TTF_Font* font;
+	SDL_Color font_color;
 	SDL_Texture* render_texture;
 	bool changed;
 };

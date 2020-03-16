@@ -3,10 +3,12 @@
 #include "editor.hpp"
 #include "system.hpp"
 
-Editor::Editor(Ivec pos, Ivec size, short border_size) :
-Instance(pos, size, border_size)
+Editor::Editor(Ivec pos, Ivec size, short border_size, SDL_Color border_color,
+			   SDL_Color font_color) :
+Instance(pos, size, border_size, border_color)
 {
 	this->font = Resources::get_font(Resources::MONO);
+	this->font_color = font_color;
 	this->render_texture = nullptr;
 	this->changed = true;
 	this->row = 0;
@@ -14,7 +16,7 @@ Instance(pos, size, border_size)
 	SDL_StartTextInput();
 	this->scroll_chars = { 0, 0 };
 
-	read("res/test/test.txt");
+	read("res/test/test.cpp");
 }
 
 Editor::~Editor()
@@ -84,8 +86,7 @@ void Editor::render()
 		for(size_t i = 0; i < text.size(); i++)
 		{
 			const char* surface_text = text[i].c_str();
-			surface = TTF_RenderText_Blended(font, surface_text,
-											 SDL_Color{ 255, 0, 0, 255 });
+			surface = TTF_RenderText_Blended(font, surface_text, font_color);
 			texture_part = SDL_CreateTextureFromSurface(SDL::renderer, surface);
 			SDL_Rect line_pos;
 			SDL_QueryTexture(texture_part, nullptr, nullptr, &line_pos.w,
@@ -171,6 +172,10 @@ void Editor::process_event(const SDL_Event& event)
 									text.erase(text.begin() + col + 1);
 									text[col].append(copy);
 									this->row = text[col].size() - copy.size();
+								}
+								else
+								{
+									text.erase(text.begin() + col + 1);
 								}
 							}
 							this->changed = true;

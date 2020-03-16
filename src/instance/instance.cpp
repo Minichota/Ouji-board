@@ -4,12 +4,14 @@
 #include "system.hpp"
 
 State Instance::state = NORMAL;
-Instance::Instance(Ivec pos, Ivec size, short border_size)
+Instance::Instance(Ivec pos, Ivec size, short border_size,
+				   SDL_Color border_color)
 {
 	this->pos = pos;
 	this->size = size;
 	this->thread = std::thread(&Instance::thread_update, this);
 	this->border_size = border_size;
+	this->border_color = border_color;
 	this->render_size = { size.x - 2 * border_size, size.y - 2 * border_size };
 	this->active = false;
 }
@@ -40,11 +42,12 @@ void Instance::render()
 {
 	if(active)
 	{
-		SDL_SetRenderDrawColor(SDL::renderer, 0, 0, 255, 255);
+		SDL_SetRenderDrawColor(SDL::renderer, border_color.r, border_color.g,
+							   border_color.b, border_color.a);
 	}
 	else
 	{
-		SDL_SetRenderDrawColor(SDL::renderer, 255, 0, 255, 255);
+		SDL_SetRenderDrawColor(SDL::renderer, 0, 0, 0, 255);
 	}
 	SDL_Rect rect = { pos.x, pos.y, size.x, size.y };
 	SDL_RenderFillRect(SDL::renderer, &rect);

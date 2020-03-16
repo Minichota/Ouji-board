@@ -9,7 +9,8 @@
 class Editor : public Instance
 {
 	public:
-	Editor(Ivec pos, Ivec size, short border_size);
+	Editor(Ivec pos, Ivec size, short border_size, SDL_Color border_color,
+		   SDL_Color font_color);
 	~Editor();
 
 	void update() override;
@@ -24,6 +25,7 @@ class Editor : public Instance
 	std::vector<std::string> text;
 	size_t col, row;
 	TTF_Font* font;
+	SDL_Color font_color;
 	SDL_Texture* render_texture;
 
 	Ivec scroll_chars;

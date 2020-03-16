@@ -4,10 +4,12 @@
 
 #include <unistd.h>
 
-Terminal::Terminal(Ivec pos, Ivec size, short border_size) :
-Instance(pos, size, border_size)
+Terminal::Terminal(Ivec pos, Ivec size, short border_size,
+				   SDL_Color border_color, SDL_Color font_color) :
+Instance(pos, size, border_size, border_color)
 {
 	this->font = Resources::get_font(Resources::MONO);
+	this->font_color = font_color;
 	this->render_texture = nullptr;
 	this->changed = true;
 	SDL_StartTextInput();
@@ -41,11 +43,16 @@ std::vector<std::string> split_string(const std::string& str,
 
 void Terminal::update()
 {
+	// loads text with new information from tty
 	std::string tty_out = read_command();
 	if(!tty_out.empty())
 	{
 		std::vector<std::string> output = split_string(tty_out, "\n");
-		output.pop_back();
+		if(output.size() > 1)
+		{
+			output.pop_back();
+		}
+		this->text.push_back(text[0]);
 		for(std::string s : output)
 		{
 			this->text.push_back(s);
@@ -57,8 +64,10 @@ void Terminal::update()
 void Terminal::render()
 {
 	Instance::render();
+	// updates text
 	if(changed)
 	{
+		// creates a large texture from all the lines of text
 		if(this->render_texture != nullptr)
 		{
 			SDL_DestroyTexture(render_texture);
@@ -71,8 +80,8 @@ void Terminal::render()
 		for(size_t i = 0; i < text.size(); i++)
 		{
 			const char* render_text = text[i].c_str();
-			SDL_Surface* surface = TTF_RenderText_Blended(
-				font, render_text, SDL_Color{ 255, 0, 0, 255 });
+			SDL_Surface* surface =
+				TTF_RenderText_Blended(font, render_text, font_color);
 			SDL_Texture* texture =
 				SDL_CreateTextureFromSurface(SDL::renderer, surface);
 
@@ -89,11 +98,25 @@ void Terminal::render()
 		SDL_SetRenderTarget(SDL::renderer, nullptr);
 		this->changed = false;
 	}
+	// actual rendering of text
 	if(render_texture != nullptr)
 	{
 		SDL_Rect dest_rect = { pos.x + border_size, pos.y + border_size,
 							   render_size.x, render_size.y };
 		SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &dest_rect);
+	}
+	// rendering cursor
+	SDL_Rect cursor{ pos.x + border_size + glyph_size.x * (int)text[0].size(),
+					 pos.y + border_size, glyph_size.x, glyph_size.y };
+	SDL_SetRenderDrawColor(SDL::renderer, 255, 255, 255, 100);
+	SDL_SetRenderDrawBlendMode(SDL::renderer, SDL_BLENDMODE_BLEND);
+	if(active)
+	{
+		SDL_RenderFillRect(SDL::renderer, &cursor);
+	}
+	else
+	{
+		SDL_RenderDrawRect(SDL::renderer, &cursor);
 	}
 }
 
@@ -119,7 +142,6 @@ void Terminal::process_event(const SDL_Event& event)
 						case SDLK_RETURN:
 						{
 							set_command(text[0]);
-							this->text[0].clear();
 						}
 						break;
 						case SDLK_BACKSPACE:
