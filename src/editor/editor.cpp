@@ -311,35 +311,38 @@ void Editor::process_event(const SDL_Event& event)
 						break;
 						case SDLK_b:
 						{
+							bool next_word_flag = false;
 							if(keys[SDL_SCANCODE_LCTRL])
 							{
-								if(row != 0)
+								for(char* c = &text[col][row];
+									*c == ' ' || !next_word_flag;
+									c = &text[col][row])
 								{
-									for(char* c = &text[col][row]; *c != ' ';
-										c = &text[col][row + 1])
+									if(row == 0)
 									{
-										if(row == 0)
+										if(col > 0)
 										{
-											if(col > 0)
-											{
-												this->col--;
-												this->row = text[col].size();
-											}
-											break;
+											this->col--;
+											this->row = text[col].size();
 										}
-										else
+										break;
+									}
+									else
+									{
+										if(*c == ' ')
 										{
-											this->row--;
+											next_word_flag = true;
 										}
+										this->row--;
 									}
 								}
-								else
+							}
+							else
+							{
+								if(col > 0)
 								{
-									if(col > 0)
-									{
-										this->col--;
-										this->row = text[col].size();
-									}
+									this->col--;
+									this->row = text[col].size();
 								}
 							}
 						}
