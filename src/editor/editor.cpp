@@ -348,8 +348,10 @@ void Editor::process_event(const SDL_Event& event)
 						{
 							if(keys[SDL_SCANCODE_LCTRL])
 							{
-								for(char* c = &text[col][row]; *c != ' ';
-									c = &text[col][row - 1])
+								bool next_word_flag = false;
+								for(char* c = &text[col][row];
+									*c == ' ' || !next_word_flag;
+									c = &text[col][row])
 								{
 									if(row == text[col].size())
 									{
@@ -362,6 +364,10 @@ void Editor::process_event(const SDL_Event& event)
 									}
 									else
 									{
+										if(*c == ' ')
+										{
+											next_word_flag = true;
+										}
 										row++;
 									}
 								}
