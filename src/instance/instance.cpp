@@ -12,7 +12,6 @@ Instance::Instance(Ivec pos, Ivec size, short border_size,
 	this->thread = std::thread(&Instance::thread_update, this);
 	this->border_size = border_size;
 	this->border_color = border_color;
-	this->render_size = { size.x - 2 * border_size, size.y - 2 * border_size };
 	this->active = false;
 }
 

@@ -36,5 +36,10 @@ enum font_type
 SDL_Texture* create_text(std::string text, font_type font);
 TTF_Font* get_font(font_type type);
 };
+namespace Util
+{
+std::vector<std::string> split_string(const std::string& data,
+									  const char delimiter);
+};
 
 #endif

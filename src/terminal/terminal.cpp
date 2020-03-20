@@ -21,33 +21,13 @@ Terminal::~Terminal()
 	SDL_DestroyTexture(render_texture);
 }
 
-std::vector<std::string> split_string(const std::string& str,
-									  const std::string& delimiter)
-{
-	// TODO fix hacky solution
-	std::vector<std::string> strings;
-
-	std::string::size_type pos = 0;
-	std::string::size_type prev = 0;
-	while((pos = str.find(delimiter, prev)) != std::string::npos)
-	{
-		strings.push_back(str.substr(prev, pos - prev));
-		prev = pos + 1;
-	}
-
-	// To get the last substring (or only, if delimiter is not found)
-	strings.push_back(str.substr(prev));
-
-	return strings;
-}
-
 void Terminal::update()
 {
 	// loads text with new information from tty
 	std::string tty_out = read_command();
 	if(!tty_out.empty())
 	{
-		std::vector<std::string> output = split_string(tty_out, "\n");
+		std::vector<std::string> output = Util::split_string(tty_out, '\n');
 		if(output.size() > 1)
 		{
 			output.pop_back();
@@ -86,7 +66,7 @@ void Terminal::render()
 		TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
 		SDL_Texture* render_complete = SDL_CreateTexture(
 			SDL::renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-			render_size.x, render_size.y);
+			(size.x - border_size), (size.y - border_size));
 		SDL_SetRenderTarget(SDL::renderer, render_complete);
 		for(size_t i = 0; i < text.size(); i++)
 		{
@@ -113,7 +93,7 @@ void Terminal::render()
 	if(render_texture != nullptr)
 	{
 		SDL_Rect dest_rect = { pos.x + border_size, pos.y + border_size,
-							   render_size.x, render_size.y };
+							   (size.x - border_size), (size.y - border_size) };
 		SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &dest_rect);
 	}
 	// rendering cursor

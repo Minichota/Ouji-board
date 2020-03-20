@@ -33,15 +33,11 @@ int main()
 {
 	load_sdl();
 	load_res();
-	Ivec instance_size = { window_size.x / 2, window_size.y };
-	Editor win =
-		Editor(Ivec(0, 0), window_size, 5, SDL_Color{ 255, 255, 255, 255 },
-			   SDL_Color{ 255, 255, 255, 255 });
-	Terminal win2 = Terminal(Ivec(instance_size.x, 0), instance_size, 5,
-							 SDL_Color{ 255, 255, 255, 255 },
-							 SDL_Color{ 255, 255, 255, 255 });
+	Ivec instance_size = { window_size.x, window_size.y };
+	Editor win = Editor(Ivec(0, 0), Ivec(window_size.x, window_size.y), 5,
+						SDL_Color{ 255, 255, 255, 255 },
+						SDL_Color{ 255, 255, 255, 255 });
 	instances.push_back(&win);
-	// instances.push_back(&win2);
 
 	current_instance = 0;
 	instances[current_instance]->active = true;
