@@ -14,7 +14,7 @@ Instance(pos, size, border_size)
 	SDL_StartTextInput();
 	this->scroll_chars = { 0, 0 };
 
-	read("res/test/test.txt");
+	read("/home/ouji/programming/drew/main.c");
 }
 
 Editor::~Editor()
@@ -51,6 +51,14 @@ void Editor::update()
 			this->scroll_chars.y = 0;
 			break;
 		}
+		this->changed = true;
+	}
+	// handle resizing
+	Ivec texture_size;
+	SDL_QueryTexture(render_texture, nullptr, nullptr, &texture_size.x,
+					 &texture_size.y);
+	if(size != texture_size)
+	{
 		this->changed = true;
 	}
 }
@@ -402,7 +410,7 @@ void Editor::process_event(const SDL_Event& event)
 				case SDLK_r:
 				{
 					// reload
-					read(std::string("res/test/test.txt"));
+					read(std::string("/home/ouji/programming/drew/main.c"));
 					this->changed = true;
 					Instance::state = NORMAL;
 				}
@@ -410,7 +418,7 @@ void Editor::process_event(const SDL_Event& event)
 				case SDLK_s:
 				{
 					// save file
-					save(std::string("res/test/test.txt"));
+					save(std::string("/home/ouji/programming/drew/main.c"));
 					Instance::state = NORMAL;
 				}
 				break;

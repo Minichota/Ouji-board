@@ -13,8 +13,10 @@
 #include <unistd.h>
 
 static std::string out;
+std::string error_out;
 std::atomic<char*> command;
 static bool active = true;
+std::atomic<bool> done = false;
 
 void set_command(std::string comm)
 {
@@ -25,7 +27,26 @@ std::string read_command()
 {
 	std::string out_copy = out;
 	out.clear();
+	if(!error_out.empty())
+	{
+		out_copy.append("Errors include:\n");
+		out_copy.append(error_out.c_str());
+		error_out.clear();
+	}
+	out_copy.append("all done compiling :D");
 	return out_copy;
+}
+
+std::string wait_command()
+{
+	while(true)
+	{
+		if(done.load())
+		{
+			done = false;
+			return read_command();
+		}
+	}
 }
 
 void tty_loop()
@@ -54,7 +75,6 @@ void tty_loop()
 	{
 		while(active)
 		{
-			// std::cout << "command: " << command.load() << std::endl;
 			if(*command.load() != '\0')
 			{
 				write(pipe_to_sh[1], command.load(), strlen(command.load()));
@@ -96,10 +116,11 @@ void tty_loop()
 					if(FD_ISSET(pipe_to_te_error[0], &rfd))
 					{
 						read(pipe_to_te_error[0], &c, 1);
-						out.push_back(c);
+						error_out.push_back(c);
 					}
 				} while(FD_ISSET(pipe_to_te[0], &rfd) ||
 						FD_ISSET(pipe_to_te_error[0], &rfd));
+				done = true;
 			}
 		}
 		kill(pid, SIGKILL);
