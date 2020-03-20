@@ -41,5 +41,15 @@ namespace Util
 std::vector<std::string> split_string(const std::string& data,
 									  const char delimiter);
 };
+namespace Settings
+{
+enum Setting
+{
+	VOLUME = 0,
+	COMPILE = 1
+};
+static std::vector<std::string> setting_values = { "0", "make all" };
+std::string& get_setting(Setting setting);
+};
 
 #endif

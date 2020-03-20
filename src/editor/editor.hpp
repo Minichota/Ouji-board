@@ -9,8 +9,8 @@
 class Editor : public Instance
 {
 	public:
-	Editor(Ivec pos, Ivec size, short border_size, SDL_Color border_color,
-		   SDL_Color font_color);
+	Editor(Ivec pos, Ivec size, short border_size, std::string file,
+		   SDL_Color border_color, SDL_Color font_color);
 	~Editor();
 
 	void update() override;
@@ -22,6 +22,7 @@ class Editor : public Instance
 	void save(std::string path);
 
 	private:
+	std::string curr_file;
 	std::vector<std::string> text;
 	size_t col, row;
 	TTF_Font* font;

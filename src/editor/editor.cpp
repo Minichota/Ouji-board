@@ -3,8 +3,8 @@
 #include "editor.hpp"
 #include "system.hpp"
 
-Editor::Editor(Ivec pos, Ivec size, short border_size, SDL_Color border_color,
-			   SDL_Color font_color) :
+Editor::Editor(Ivec pos, Ivec size, short border_size, std::string file,
+			   SDL_Color border_color, SDL_Color font_color) :
 Instance(pos, size, border_size, border_color)
 {
 	this->font = Resources::get_font(Resources::MONO);
@@ -15,9 +15,10 @@ Instance(pos, size, border_size, border_color)
 	this->col = 0;
 	SDL_StartTextInput();
 	this->scroll_chars = { 0, 0 };
+	this->curr_file = file;
 
 	// TODO change file location
-	read("/home/ouji/programming/drew/main.c");
+	read(curr_file);
 }
 
 Editor::~Editor()
@@ -417,7 +418,7 @@ void Editor::process_event(const SDL_Event& event)
 				case SDLK_r:
 				{
 					// reload
-					read(std::string("/home/ouji/programming/drew/main.c"));
+					read(std::string(curr_file));
 					this->changed = true;
 					Instance::state = NORMAL;
 				}
@@ -425,7 +426,7 @@ void Editor::process_event(const SDL_Event& event)
 				case SDLK_s:
 				{
 					// save file
-					save(std::string("/home/ouji/programming/drew/main.c"));
+					save(curr_file);
 					Instance::state = NORMAL;
 				}
 				break;

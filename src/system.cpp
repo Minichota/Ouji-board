@@ -116,3 +116,12 @@ std::vector<std::string> split_string(const std::string& str,
 }
 
 };
+
+namespace Settings
+{
+std::string& get_setting(Setting setting)
+{
+	return setting_values[setting];
+}
+
+};

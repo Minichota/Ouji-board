@@ -35,7 +35,7 @@ int main()
 	load_res();
 	Ivec instance_size = { window_size.x, window_size.y };
 	Editor win = Editor(Ivec(0, 0), Ivec(window_size.x, window_size.y), 5,
-						SDL_Color{ 255, 255, 255, 255 },
+						"res/test/test.cpp", SDL_Color{ 255, 255, 255, 255 },
 						SDL_Color{ 255, 255, 255, 255 });
 	instances.push_back(&win);
 
