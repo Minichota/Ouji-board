@@ -26,6 +26,15 @@ class Instance
 
 	bool collides(Ivec m_pos);
 
+	Ivec& get_pos()
+	{
+		return this->pos;
+	}
+	Ivec& get_size()
+	{
+		return this->size;
+	}
+
 	bool active;
 
 	static State state;
@@ -35,7 +44,6 @@ class Instance
 	Ivec size;
 	short border_size;
 	SDL_Color border_color;
-	Ivec render_size;
 
 	private:
 	std::thread thread;

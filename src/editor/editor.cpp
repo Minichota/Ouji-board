@@ -66,8 +66,8 @@ void Editor::render()
 	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
 	if(changed && text.size() > 0)
 	{
-		this->num_cells =
-			Ivec(render_size.x / glyph_size.x, render_size.y / glyph_size.y);
+		this->num_cells = Ivec((size.x - border_size * 2) / glyph_size.x,
+							   (size.y - border_size * 2) / glyph_size.y);
 		if(render_texture != nullptr)
 		{
 			SDL_DestroyTexture(render_texture);
@@ -75,7 +75,7 @@ void Editor::render()
 		// a new blank texture
 		SDL_Texture* render_complete = SDL_CreateTexture(
 			SDL::renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-			render_size.x, render_size.y);
+			(size.x - border_size * 2), (size.y - border_size * 2));
 
 		// setting to draw to blank texture
 		SDL_SetRenderTarget(SDL::renderer, render_complete);
