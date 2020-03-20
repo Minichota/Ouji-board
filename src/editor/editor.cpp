@@ -346,14 +346,6 @@ void Editor::process_event(const SDL_Event& event)
 									}
 								}
 							}
-							else
-							{
-								if(col > 0)
-								{
-									this->col--;
-									this->row = text[col].size();
-								}
-							}
 						}
 						break;
 						case SDLK_n:
