@@ -30,6 +30,7 @@ $(addprefix $(O_DIR)/,$(cpp_dirs)):
 .PHONY: clean run
 clean:
 	rm -rf $(O_DIR)
+	rm $(PROGRAM_NAME)
 
 run: $(PROGRAM_NAME)
 	./$<
