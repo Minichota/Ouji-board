@@ -71,7 +71,7 @@ void handle_events(const SDL_Event& event)
 					{
 						Ivec& last_pos = instances.back()->get_pos();
 						Ivec& last_size = instances.back()->get_size();
-						set_command(Settings::get_setting(Settings::COMPILE));
+						set_command(Settings::get_setting("compile"));
 						std::string out = wait_command();
 						TextBuffer* compile_buffer = new TextBuffer(
 							Ivec(last_pos.x + last_size.x / 2, last_pos.y),

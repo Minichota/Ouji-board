@@ -22,6 +22,22 @@ static bool process_events()
 				return false;
 			}
 			break;
+			case SDL_KEYDOWN:
+			{
+				switch(event.key.keysym.sym)
+				{
+					case SDLK_z:
+					{
+						if(Instance::state == COMMAND)
+						{
+							Settings::update_settings();
+							Instance::state = NORMAL;
+						}
+					}
+					break;
+				}
+			}
+			break;
 		}
 		handle_events(event);
 
@@ -34,9 +50,10 @@ int main()
 	load_sdl();
 	load_res();
 	Ivec instance_size = { window_size.x, window_size.y };
-	Editor win = Editor(Ivec(0, 0), Ivec(window_size.x, window_size.y), 5,
-						"res/test/test.cpp", SDL_Color{ 255, 255, 255, 255 },
-						SDL_Color{ 255, 255, 255, 255 });
+	Editor win =
+		Editor(Ivec(0, 0), Ivec(window_size.x, window_size.y), 5,
+			   "res/settings/settings.ou", SDL_Color{ 255, 255, 255, 255 },
+			   SDL_Color{ 255, 255, 255, 255 });
 	instances.push_back(&win);
 
 	current_instance = 0;
@@ -47,6 +64,7 @@ int main()
 	size_t command_cache =
 		Resources::cache_text(Resources::create_text("COMMAND MODE", MONO));
 
+	Settings::update_settings();
 	start_tty();
 
 	while(true)

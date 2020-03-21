@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <fstream>
 #include <vector>
 
 #include "system.hpp"
@@ -119,9 +120,31 @@ std::vector<std::string> split_string(const std::string& str,
 
 namespace Settings
 {
-std::string& get_setting(Setting setting)
+std::string& get_setting(std::string setting_name)
 {
-	return setting_values[setting];
+	return setting_values[setting_name];
+}
+void update_settings()
+{
+	std::ifstream file(settings_path);
+	std::string line;
+	while(getline(file, line))
+	{
+		std::vector<std::string> data = Util::split_string(line, '=');
+		std::map<std::string, std::string>::iterator replace =
+			setting_values.find(data[0]);
+		if(replace != setting_values.end())
+		{
+			// replace existing setting
+			replace->second = data[1];
+		}
+		else
+		{
+			// insert new setting
+			setting_values.insert(std::pair(data[0], data[1]));
+		}
+	}
+	file.close();
 }
 
 };

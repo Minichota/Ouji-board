@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <map>
 #include <vector>
 
 #include "instance.hpp"
@@ -43,13 +44,12 @@ std::vector<std::string> split_string(const std::string& data,
 };
 namespace Settings
 {
-enum Setting
-{
-	VOLUME = 0,
-	COMPILE = 1
-};
-static std::vector<std::string> setting_values = { "0", "make all" };
-std::string& get_setting(Setting setting);
+static std::string settings_path = "res/settings/settings.ou";
+static std::map<std::string, std::string> setting_values = { { "volume", "0" },
+															 { "compile",
+															   "make all" } };
+std::string& get_setting(std::string setting_name);
+void update_settings();
 };
 
 #endif
