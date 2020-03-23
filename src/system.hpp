@@ -21,6 +21,15 @@ const static Ivec window_size = { 1920, 1080 };
 void load_sdl();
 void clear_sdl();
 };
+namespace Time
+{
+extern long long prev_time;
+extern long long time;
+extern bool paused;
+void update_time();
+void toggle_time();
+long long get_time();
+};
 namespace Resources
 {
 extern std::vector<TTF_Font*> fonts;

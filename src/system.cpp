@@ -43,6 +43,33 @@ void clear_sdl()
 }
 }
 
+namespace Time
+{
+long long prev_time;
+long long time;
+bool paused;
+void update_time()
+{
+	if(!paused)
+	{
+		time += SDL_GetTicks() - prev_time;
+		prev_time = time;
+	}
+	else
+	{
+		prev_time = SDL_GetTicks();
+	}
+}
+void toggle_time()
+{
+	paused = !paused;
+}
+long long get_time()
+{
+	return time;
+}
+}
+
 namespace Resources
 {
 std::vector<TTF_Font*> fonts;
