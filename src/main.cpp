@@ -2,6 +2,7 @@
 
 #include "editor.hpp"
 #include "instance-control.hpp"
+#include "setting-editor.hpp"
 #include "system.hpp"
 #include "terminal.hpp"
 #include "tty.hpp"
@@ -49,22 +50,27 @@ int main()
 {
 	load_sdl();
 	load_res();
+	Settings::update_settings();
 	Ivec instance_size = { window_size.x, window_size.y };
 	Editor win =
 		Editor(Ivec(0, 0), Ivec(window_size.x, window_size.y), 5,
 			   "res/settings/settings.ou", SDL_Color{ 255, 255, 255, 255 },
 			   SDL_Color{ 255, 255, 255, 255 });
-	instances.push_back(&win);
+	push_instance(&win);
+
+	SettingEditor settings = SettingEditor(
+		Ivec(window_size.x / 2, 0), Ivec(window_size.x / 2, window_size.y), 5,
+		SDL_Color{ 255, 255, 255, 255 });
+	push_instance(&settings);
 
 	current_instance = 0;
 	instances[current_instance]->active = true;
 
-	size_t normal_cache =
-		Resources::cache_text(Resources::create_text("NORMAL MODE", MONO));
-	size_t command_cache =
-		Resources::cache_text(Resources::create_text("COMMAND MODE", MONO));
+	size_t normal_cache = Resources::cache_text(Resources::create_text(
+		"NORMAL MODE", MONO, SDL_Color{ 255, 255, 255, 255 }));
+	size_t command_cache = Resources::cache_text(Resources::create_text(
+		"COMMAND MODE", MONO, SDL_Color{ 255, 255, 255, 255 }));
 
-	Settings::update_settings();
 	start_tty();
 
 	while(true)

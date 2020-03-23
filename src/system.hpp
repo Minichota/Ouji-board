@@ -34,7 +34,7 @@ enum font_type
 {
 	MONO = 0
 };
-SDL_Texture* create_text(std::string text, font_type font);
+SDL_Texture* create_text(std::string text, font_type font, SDL_Color color);
 TTF_Font* get_font(font_type type);
 };
 namespace Util
@@ -49,7 +49,10 @@ static std::map<std::string, std::string> setting_values = { { "volume", "0" },
 															 { "compile",
 															   "make all" } };
 std::string& get_setting(std::string setting_name);
+std::vector<std::pair<std::string, std::string>> get_all_settings();
 void update_settings();
+void save_settings(
+	std::vector<std::pair<std::string, std::string>> new_settings);
 };
 
 #endif

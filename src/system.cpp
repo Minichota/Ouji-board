@@ -60,11 +60,10 @@ SDL_Texture* load_cache_text(size_t pos)
 	return text_cache[pos];
 }
 
-SDL_Texture* create_text(std::string text, font_type font)
+SDL_Texture* create_text(std::string text, font_type font, SDL_Color color)
 {
 	SDL_Surface* surface =
-		TTF_RenderText_Blended(Resources::get_font(font), text.c_str(),
-							   SDL_Color{ 255, 255, 255, 255 });
+		TTF_RenderText_Blended(Resources::get_font(font), text.c_str(), color);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(SDL::renderer, surface);
 	SDL_FreeSurface(surface);
 	return texture;
@@ -124,6 +123,11 @@ std::string& get_setting(std::string setting_name)
 {
 	return setting_values[setting_name];
 }
+std::vector<std::pair<std::string, std::string>> get_all_settings()
+{
+	return std::vector<std::pair<std::string, std::string>>(
+		setting_values.begin(), setting_values.end());
+}
 void update_settings()
 {
 	std::ifstream file(settings_path);
@@ -144,6 +148,19 @@ void update_settings()
 			setting_values.insert(std::pair(data[0], data[1]));
 		}
 	}
+	file.close();
+}
+
+void save_settings(
+	std::vector<std::pair<std::string, std::string>> new_settings)
+{
+	std::ofstream file(settings_path);
+	std::string of_data;
+	for(std::pair<std::string, std::string> line : new_settings)
+	{
+		of_data.append(line.first + "=" + line.second + "\n");
+	}
+	file << of_data;
 	file.close();
 }
 

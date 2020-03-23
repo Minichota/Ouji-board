@@ -89,22 +89,18 @@ void Editor::render()
 
 		// setting to draw to blank texture
 		SDL_SetRenderTarget(SDL::renderer, render_complete);
-		SDL_Surface* surface;
-		SDL_Texture* texture_part;
 
 		// rendering each layer to blank texture
 		for(size_t i = 0; i < text.size(); i++)
 		{
-			const char* surface_text = text[i].c_str();
-			surface = TTF_RenderText_Blended(font, surface_text, font_color);
-			texture_part = SDL_CreateTextureFromSurface(SDL::renderer, surface);
+			SDL_Texture* texture_part =
+				Resources::create_text(text[i], Resources::MONO, font_color);
 			SDL_Rect line_pos;
 			SDL_QueryTexture(texture_part, nullptr, nullptr, &line_pos.w,
 							 &line_pos.h);
 			line_pos.x = -scroll_chars.x * glyph_size.x;
 			line_pos.y = i * line_pos.h - scroll_chars.y * glyph_size.y;
 			SDL_RenderCopy(SDL::renderer, texture_part, NULL, &line_pos);
-			SDL_FreeSurface(surface);
 			SDL_DestroyTexture(texture_part);
 		}
 		// assigning blank texture to classes texture and resetting renderer

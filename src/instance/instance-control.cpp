@@ -31,10 +31,13 @@ void handle_events(const SDL_Event& event)
 					if(Instance::state == COMMAND)
 					{
 						instances[current_instance]->active = false;
-						current_instance--;
-						if(current_instance == (size_t)-1)
+						if(current_instance == 0)
 						{
 							current_instance = instances.size() - 1;
+						}
+						else
+						{
+							current_instance--;
 						}
 						instances[current_instance]->active = true;
 						Instance::state = NORMAL;
@@ -105,9 +108,12 @@ void handle_events(const SDL_Event& event)
 
 void push_instance(Instance* instance)
 {
-	Ivec& last_pos = instances.back()->get_pos();
-	Ivec& last_size = instances.back()->get_size();
-	last_size = Ivec(last_size.x / 2, last_size.y);
+	if(instances.size() > 0)
+	{
+		Ivec& last_pos = instances.back()->get_pos();
+		Ivec& last_size = instances.back()->get_size();
+		last_size = Ivec(last_size.x / 2, last_size.y);
+	}
 	instances.push_back(instance);
 }
 
