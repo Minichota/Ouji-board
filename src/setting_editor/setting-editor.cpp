@@ -4,11 +4,16 @@
 
 SettingEditor::SettingEditor(Ivec pos, Ivec size, short border_size,
 							 SDL_Color border_color) :
-Instance(pos, size, border_size, border_color)
+Instance(pos, size, border_size, border_color),
+animation(Ivec(pos.x + border_size, pos.y + border_size), 1000,
+		  Resources::create_text("SAVED", Resources::MONO,
+								 SDL_Color{ 255, 255, 255, 255 }),
+		  SINGULAR)
 {
 	this->setting_data = Settings::get_all_settings();
 	this->changed = true;
 	this->selected_setting = 0;
+	this->render_texture = nullptr;
 	SDL_StartTextInput();
 }
 
@@ -156,6 +161,7 @@ void SettingEditor::process_event(const SDL_Event& event)
 						{
 							Settings::save_settings(setting_data);
 							Settings::update_settings();
+							animation.activate();
 						}
 						break;
 					}

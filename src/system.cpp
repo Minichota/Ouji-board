@@ -68,6 +68,10 @@ long long get_time()
 {
 	return time;
 }
+long long get_dtime()
+{
+	return SDL_GetTicks() - time;
+}
 }
 
 namespace Resources

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "fade-animation.hpp"
 #include "instance.hpp"
 
 class SettingEditor : public Instance
@@ -22,6 +23,7 @@ class SettingEditor : public Instance
 	private:
 	SDL_Texture* render_texture;
 	std::vector<std::pair<std::string, std::string>> setting_data;
+	FadeAnimation animation;
 
 	size_t selected_setting;
 

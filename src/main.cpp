@@ -1,6 +1,8 @@
 #include <SDL2/SDL.h>
 
+#include "animation.hpp"
 #include "editor.hpp"
+#include "fade-animation.hpp"
 #include "instance-control.hpp"
 #include "setting-editor.hpp"
 #include "system.hpp"
@@ -66,9 +68,9 @@ int main()
 	instances[current_instance]->active = true;
 
 	size_t normal_cache = Resources::cache_text(Resources::create_text(
-		"NORMAL MODE", MONO, SDL_Color{ 255, 255, 255, 255 }));
+		"NORMAL MODE", Resources::MONO, SDL_Color{ 255, 255, 255, 255 }));
 	size_t command_cache = Resources::cache_text(Resources::create_text(
-		"COMMAND MODE", MONO, SDL_Color{ 255, 255, 255, 255 }));
+		"COMMAND MODE", Resources::MONO, SDL_Color{ 255, 255, 255, 255 }));
 
 	start_tty();
 
@@ -78,8 +80,6 @@ int main()
 		{
 			break;
 		}
-
-		Time::update_time();
 
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
@@ -112,8 +112,10 @@ int main()
 
 		SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
 		/* render */
+		Animation::global_render();
 		SDL_RenderPresent(renderer);
 
+		Time::update_time();
 		SDL_Delay(1000.0f / 144.0f);
 	}
 

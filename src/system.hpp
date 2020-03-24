@@ -29,6 +29,7 @@ extern bool paused;
 void update_time();
 void toggle_time();
 long long get_time();
+long long get_dtime();
 };
 namespace Resources
 {
