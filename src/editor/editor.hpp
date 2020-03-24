@@ -4,6 +4,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <vector>
 
+#include "fade-animation.hpp"
 #include "instance.hpp"
 
 class Editor : public Instance
@@ -28,6 +29,7 @@ class Editor : public Instance
 	TTF_Font* font;
 	SDL_Color font_color;
 	SDL_Texture* render_texture;
+	FadeAnimation animation;
 
 	Ivec scroll_chars;
 	Ivec glyph_size;

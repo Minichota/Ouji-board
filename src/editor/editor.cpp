@@ -5,7 +5,11 @@
 
 Editor::Editor(Ivec pos, Ivec size, short border_size, std::string file,
 			   SDL_Color border_color, SDL_Color font_color) :
-Instance(pos, size, border_size, border_color)
+Instance(pos, size, border_size, border_color),
+animation(Ivec(pos.x + border_size, pos.y + border_size), 1000,
+		  Resources::create_text("SAVED", Resources::MONO,
+								 SDL_Color{ 255, 255, 255, 255 }),
+		  SINGULAR)
 {
 	this->font = Resources::get_font(Resources::MONO);
 	this->font_color = font_color;
@@ -132,6 +136,7 @@ void Editor::render()
 	{
 		SDL_RenderDrawRect(SDL::renderer, &cursor);
 	}
+	animation.render();
 }
 
 void Editor::process_event(const SDL_Event& event)
@@ -424,6 +429,7 @@ void Editor::process_event(const SDL_Event& event)
 					// save file
 					save(curr_file);
 					Instance::state = NORMAL;
+					animation.activate();
 				}
 				break;
 			}

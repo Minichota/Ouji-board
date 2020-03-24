@@ -52,7 +52,6 @@ void FadeAnimation::render()
 			}
 			break;
 		}
-		std::cout << (int)alpha << std::endl;
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 		SDL_SetTextureAlphaMod(texture, alpha);
 		SDL_Rect rect = { pos.x, pos.y };
