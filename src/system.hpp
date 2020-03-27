@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <map>
 #include <vector>
 
 #include "instance.hpp"
@@ -20,6 +21,16 @@ const static Ivec window_size = { 1920, 1080 };
 void load_sdl();
 void clear_sdl();
 };
+namespace Time
+{
+extern long long prev_time;
+extern long long time;
+extern bool paused;
+void update_time();
+void toggle_time();
+long long get_time();
+long long get_dtime();
+};
 namespace Resources
 {
 extern std::vector<TTF_Font*> fonts;
@@ -33,7 +44,7 @@ enum font_type
 {
 	MONO = 0
 };
-SDL_Texture* create_text(std::string text, font_type font);
+SDL_Texture* create_text(std::string text, font_type font, SDL_Color color);
 TTF_Font* get_font(font_type type);
 };
 namespace Util
@@ -43,13 +54,15 @@ std::vector<std::string> split_string(const std::string& data,
 };
 namespace Settings
 {
-enum Setting
-{
-	VOLUME = 0,
-	COMPILE = 1
-};
-static std::vector<std::string> setting_values = { "0", "make all" };
-std::string& get_setting(Setting setting);
+static std::string settings_path = "res/settings/settings.ou";
+static std::map<std::string, std::string> setting_values = { { "volume", "0" },
+															 { "compile",
+															   "make all" } };
+std::string& get_setting(std::string setting_name);
+std::vector<std::pair<std::string, std::string>> get_all_settings();
+void update_settings();
+void save_settings(
+	std::vector<std::pair<std::string, std::string>> new_settings);
 };
 
 #endif

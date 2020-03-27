@@ -2,7 +2,7 @@ PROGRAM_NAME=ouji_board
 SRC_DIR=src
 O_DIR=obj
 CXX=g++
-cpp_dirs=math instance editor tty terminal buffer
+cpp_dirs=math instance editor tty terminal buffer setting_editor animation
 SRC=src
 
 SRC_FILES= $(wildcard $(SRC)/*.cpp $(addsuffix /*.cpp,$(addprefix $(SRC)/,$(cpp_dirs))))

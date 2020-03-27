@@ -4,6 +4,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <vector>
 
+#include "fade-animation.hpp"
 #include "instance.hpp"
 
 class Editor : public Instance

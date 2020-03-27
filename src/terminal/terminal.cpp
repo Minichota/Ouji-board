@@ -69,11 +69,8 @@ void Terminal::render()
 		SDL_SetRenderTarget(SDL::renderer, render_complete);
 		for(size_t i = 0; i < text.size(); i++)
 		{
-			const char* render_text = text[i].c_str();
-			SDL_Surface* surface =
-				TTF_RenderText_Blended(font, render_text, font_color);
 			SDL_Texture* texture =
-				SDL_CreateTextureFromSurface(SDL::renderer, surface);
+				Resources::create_text(text[i], Resources::MONO, font_color);
 
 			SDL_Rect dest_rect = { 0, (int)i * glyph_size.y };
 			SDL_QueryTexture(texture, nullptr, nullptr, &dest_rect.w,
@@ -81,7 +78,6 @@ void Terminal::render()
 
 			SDL_RenderCopy(SDL::renderer, texture, nullptr, &dest_rect);
 
-			SDL_FreeSurface(surface);
 			SDL_DestroyTexture(texture);
 		}
 		this->render_texture = render_complete;

@@ -5,7 +5,11 @@
 
 Editor::Editor(Ivec pos, Ivec size, short border_size, std::string file,
 			   SDL_Color border_color, SDL_Color font_color) :
-Instance(pos, size, border_size, border_color)
+Instance(pos, size, border_size, border_color),
+animation(Ivec(pos.x + border_size, pos.y + border_size), 1000,
+		  Resources::create_text("SAVED", Resources::MONO,
+								 SDL_Color{ 255, 255, 255, 255 }),
+		  SINGULAR)
 {
 	this->font = Resources::get_font(Resources::MONO);
 	this->font_color = font_color;
@@ -80,22 +84,18 @@ void Editor::render()
 
 		// setting to draw to blank texture
 		SDL_SetRenderTarget(SDL::renderer, render_complete);
-		SDL_Surface* surface;
-		SDL_Texture* texture_part;
 
 		// rendering each layer to blank texture
 		for(size_t i = 0; i < text.size(); i++)
 		{
-			const char* surface_text = text[i].c_str();
-			surface = TTF_RenderText_Blended(font, surface_text, font_color);
-			texture_part = SDL_CreateTextureFromSurface(SDL::renderer, surface);
+			SDL_Texture* texture_part =
+				Resources::create_text(text[i], Resources::MONO, font_color);
 			SDL_Rect line_pos;
 			SDL_QueryTexture(texture_part, nullptr, nullptr, &line_pos.w,
 							 &line_pos.h);
 			line_pos.x = -scroll_chars.x * glyph_size.x;
 			line_pos.y = i * line_pos.h - scroll_chars.y * glyph_size.y;
 			SDL_RenderCopy(SDL::renderer, texture_part, NULL, &line_pos);
-			SDL_FreeSurface(surface);
 			SDL_DestroyTexture(texture_part);
 		}
 		// assigning blank texture to classes texture and resetting renderer
@@ -127,6 +127,7 @@ void Editor::render()
 	{
 		SDL_RenderDrawRect(SDL::renderer, &cursor);
 	}
+	animation.render();
 }
 
 void Editor::process_event(const SDL_Event& event)
@@ -419,6 +420,7 @@ void Editor::process_event(const SDL_Event& event)
 					// save file
 					save(curr_file);
 					Instance::state = NORMAL;
+					animation.activate();
 				}
 				break;
 			}

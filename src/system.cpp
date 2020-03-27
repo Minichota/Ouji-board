@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <fstream>
 #include <vector>
 
 #include "system.hpp"
@@ -42,6 +43,37 @@ void clear_sdl()
 }
 }
 
+namespace Time
+{
+long long prev_time;
+long long time;
+bool paused;
+void update_time()
+{
+	if(!paused)
+	{
+		time += SDL_GetTicks() - prev_time;
+		prev_time = time;
+	}
+	else
+	{
+		prev_time = SDL_GetTicks();
+	}
+}
+void toggle_time()
+{
+	paused = !paused;
+}
+long long get_time()
+{
+	return time;
+}
+long long get_dtime()
+{
+	return SDL_GetTicks() - time;
+}
+}
+
 namespace Resources
 {
 std::vector<TTF_Font*> fonts;
@@ -59,11 +91,10 @@ SDL_Texture* load_cache_text(size_t pos)
 	return text_cache[pos];
 }
 
-SDL_Texture* create_text(std::string text, font_type font)
+SDL_Texture* create_text(std::string text, font_type font, SDL_Color color)
 {
 	SDL_Surface* surface =
-		TTF_RenderText_Blended(Resources::get_font(font), text.c_str(),
-							   SDL_Color{ 255, 255, 255, 255 });
+		TTF_RenderText_Blended(Resources::get_font(font), text.c_str(), color);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(SDL::renderer, surface);
 	SDL_FreeSurface(surface);
 	return texture;
@@ -119,9 +150,49 @@ std::vector<std::string> split_string(const std::string& str,
 
 namespace Settings
 {
-std::string& get_setting(Setting setting)
+std::string& get_setting(std::string setting_name)
 {
-	return setting_values[setting];
+	return setting_values[setting_name];
+}
+std::vector<std::pair<std::string, std::string>> get_all_settings()
+{
+	return std::vector<std::pair<std::string, std::string>>(
+		setting_values.begin(), setting_values.end());
+}
+void update_settings()
+{
+	std::ifstream file(settings_path);
+	std::string line;
+	while(getline(file, line))
+	{
+		std::vector<std::string> data = Util::split_string(line, '=');
+		std::map<std::string, std::string>::iterator replace =
+			setting_values.find(data[0]);
+		if(replace != setting_values.end())
+		{
+			// replace existing setting
+			replace->second = data[1];
+		}
+		else
+		{
+			// insert new setting
+			setting_values.insert(std::pair(data[0], data[1]));
+		}
+	}
+	file.close();
+}
+
+void save_settings(
+	std::vector<std::pair<std::string, std::string>> new_settings)
+{
+	std::ofstream file(settings_path);
+	std::string of_data;
+	for(std::pair<std::string, std::string> line : new_settings)
+	{
+		of_data.append(line.first + "=" + line.second + "\n");
+	}
+	file << of_data;
+	file.close();
 }
 
 };
