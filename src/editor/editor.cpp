@@ -9,7 +9,6 @@ Instance(pos, size, border_size, border_color)
 {
 	this->font = Resources::get_font(Resources::MONO);
 	this->font_color = font_color;
-	this->render_texture = nullptr;
 	this->changed = true;
 	this->row = 0;
 	this->col = 0;
@@ -55,14 +54,6 @@ void Editor::update()
 			this->scroll_chars.y = 0;
 			break;
 		}
-		this->changed = true;
-	}
-	// handle resizing
-	Ivec texture_size;
-	SDL_QueryTexture(render_texture, nullptr, nullptr, &texture_size.x,
-					 &texture_size.y);
-	if(size != texture_size)
-	{
 		this->changed = true;
 	}
 }
@@ -433,6 +424,21 @@ void Editor::process_event(const SDL_Event& event)
 			}
 		}
 		break;
+	}
+}
+
+void Editor::handle_resize()
+{
+	if(render_texture != nullptr)
+	{
+		Ivec texture_size;
+		SDL_QueryTexture(render_texture, nullptr, nullptr, &texture_size.x,
+						 &texture_size.y);
+		if(Ivec(size.x - border_size * 2, size.y - border_size * 2) !=
+		   texture_size)
+		{
+			this->changed = true;
+		}
 	}
 }
 

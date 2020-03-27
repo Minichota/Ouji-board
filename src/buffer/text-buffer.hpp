@@ -18,10 +18,12 @@ class TextBuffer : public Instance
 
 	void process_event(const SDL_Event& event) override;
 
-	void set_text(std::string);
+	void handle_resize();
+
+	void set_text(std::string data);
+	void set_text(std::vector<std::string> data);
 
 	private:
-	SDL_Texture* render_texture;
 	std::vector<std::string> text;
 	SDL_Color font_color;
 };

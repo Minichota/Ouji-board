@@ -10,7 +10,6 @@ Instance(pos, size, border_size, border_color)
 {
 	this->font = Resources::get_font(Resources::MONO);
 	this->font_color = font_color;
-	this->render_texture = nullptr;
 	this->changed = true;
 	SDL_StartTextInput();
 	this->text.emplace_back();
@@ -165,5 +164,20 @@ void Terminal::process_event(const SDL_Event& event)
 			SDL_StopTextInput();
 		}
 		break;
+	}
+}
+
+void Terminal::handle_resize()
+{
+	if(render_texture != nullptr)
+	{
+		Ivec texture_size;
+		SDL_QueryTexture(render_texture, nullptr, nullptr, &texture_size.x,
+						 &texture_size.y);
+		if(Ivec(size.x - border_size * 2, size.y - border_size * 2) !=
+		   texture_size)
+		{
+			this->changed = true;
+		}
 	}
 }

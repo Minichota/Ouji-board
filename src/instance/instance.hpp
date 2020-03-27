@@ -24,6 +24,8 @@ class Instance
 
 	virtual void process_event(const SDL_Event& event);
 
+	virtual void handle_resize() = 0;
+
 	bool collides(Ivec m_pos);
 
 	Ivec& get_pos()
@@ -44,10 +46,11 @@ class Instance
 	Ivec size;
 	short border_size;
 	SDL_Color border_color;
+	SDL_Texture* render_texture;
 
 	private:
 	std::thread thread;
-	bool continue_thread = true;
+	bool continue_thread;
 };
 
 #endif
