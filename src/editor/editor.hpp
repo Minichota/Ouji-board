@@ -30,7 +30,6 @@ class Editor : public Instance
 	size_t col, row;
 	TTF_Font* font;
 	SDL_Color font_color;
-	SDL_Texture* render_texture;
 	FadeAnimation animation;
 
 	Ivec scroll_chars;
