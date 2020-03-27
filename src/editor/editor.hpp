@@ -18,6 +18,8 @@ class Editor : public Instance
 
 	void process_event(const SDL_Event& event) override;
 
+	void handle_resize() override;
+
 	void read(std::string path);
 	void save(std::string path);
 
@@ -28,6 +30,7 @@ class Editor : public Instance
 	TTF_Font* font;
 	SDL_Color font_color;
 	SDL_Texture* render_texture;
+	FadeAnimation animation;
 
 	Ivec scroll_chars;
 	Ivec glyph_size;

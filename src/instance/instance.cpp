@@ -9,10 +9,12 @@ Instance::Instance(Ivec pos, Ivec size, short border_size,
 {
 	this->pos = pos;
 	this->size = size;
-	this->thread = std::thread(&Instance::thread_update, this);
+	this->continue_thread = true;
 	this->border_size = border_size;
 	this->border_color = border_color;
 	this->active = false;
+	this->render_texture = nullptr;
+	this->thread = std::thread(&Instance::thread_update, this);
 }
 
 Instance::~Instance()
@@ -23,12 +25,13 @@ Instance::~Instance()
 
 void Instance::thread_update()
 {
-	while(true && continue_thread)
+	while(continue_thread)
 	{
 		if(active)
 		{
 			update();
 		}
+		handle_resize();
 		SDL_Delay(1000.0f / 144.0f);
 	}
 }

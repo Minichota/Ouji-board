@@ -18,6 +18,8 @@ class Terminal : public Instance
 
 	void process_event(const SDL_Event& event) override;
 
+	void handle_resize();
+
 	private:
 	std::vector<std::string> text;
 	Ivec cursor_pos;
@@ -25,7 +27,6 @@ class Terminal : public Instance
 
 	TTF_Font* font;
 	SDL_Color font_color;
-	SDL_Texture* render_texture;
 	bool changed;
 };
 
