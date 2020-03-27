@@ -21,6 +21,7 @@ void TextBuffer::update()
 void TextBuffer::render()
 {
 	Instance::render();
+	handle_resize();
 	SDL_Rect dest = { pos.x + border_size, pos.y + border_size,
 					  (size.x - border_size * 2), (size.y - border_size * 2) };
 	SDL_RenderCopy(SDL::renderer, render_texture, NULL, &dest);

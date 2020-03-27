@@ -54,6 +54,7 @@ void Terminal::update()
 void Terminal::render()
 {
 	Instance::render();
+	handle_resize();
 	// updates text
 	if(changed)
 	{

@@ -31,7 +31,6 @@ void Instance::thread_update()
 		{
 			update();
 		}
-		handle_resize();
 		SDL_Delay(1000.0f / 144.0f);
 	}
 }

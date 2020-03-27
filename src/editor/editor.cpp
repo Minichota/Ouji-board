@@ -66,6 +66,8 @@ void Editor::render()
 {
 	// rendering outline
 	Instance::render();
+
+	handle_resize();
 	// rendering cursor
 
 	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);

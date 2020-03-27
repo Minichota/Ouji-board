@@ -28,6 +28,7 @@ void SettingEditor::update()
 void SettingEditor::render()
 {
 	Instance::render();
+	handle_resize();
 	if(changed)
 	{
 		Ivec glyph_size;
