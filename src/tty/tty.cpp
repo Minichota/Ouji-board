@@ -33,7 +33,6 @@ std::string read_command()
 		out_copy.append(error_out.c_str());
 		error_out.clear();
 	}
-	out_copy.append("all done compiling :D");
 	return out_copy;
 }
 
