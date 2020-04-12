@@ -21,6 +21,7 @@ Instance::~Instance()
 {
 	this->continue_thread = false;
 	this->thread.join();
+	SDL_DestroyTexture(render_texture);
 }
 
 void Instance::thread_update()

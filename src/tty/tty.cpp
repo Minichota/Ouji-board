@@ -12,11 +12,10 @@
 #include <thread>
 #include <unistd.h>
 
-static std::string out;
+char* const out = (char*)malloc(10000);
 std::string error_out;
 std::atomic<char*> command;
 static bool active = true;
-std::atomic<bool> done = false;
 
 void set_command(std::string comm)
 {
@@ -26,7 +25,7 @@ void set_command(std::string comm)
 std::string read_command()
 {
 	std::string out_copy = out;
-	out.clear();
+	memset(out, 0, 10000);
 	if(!error_out.empty())
 	{
 		out_copy.append("Errors include:\n");
@@ -36,16 +35,9 @@ std::string read_command()
 	return out_copy;
 }
 
-std::string wait_command()
+char* get_out_stream()
 {
-	while(true)
-	{
-		if(done.load())
-		{
-			done = false;
-			return read_command();
-		}
-	}
+	return out;
 }
 
 void tty_loop()
@@ -103,15 +95,12 @@ void tty_loop()
 					if(FD_ISSET(pipe_to_te[0], &rfd))
 					{
 						read(pipe_to_te[0], &c, 1);
-						out.push_back(c);
+						int len = strlen(out);
+						out[len] = c;
+						out[len + 1] = '\0';
 					}
 
-					// Check for data on the STDERR pipe; the
-					// executed console will write error messages
-					// on this pipe (for instance the error message
-					// that results from typing an unexisting command.
-					// Just for display purposes, the STDERR messages
-					// will be shown in upper case.
+					// Check for data on the STDERR pipe
 					if(FD_ISSET(pipe_to_te_error[0], &rfd))
 					{
 						read(pipe_to_te_error[0], &c, 1);
@@ -119,13 +108,13 @@ void tty_loop()
 					}
 				} while(FD_ISSET(pipe_to_te[0], &rfd) ||
 						FD_ISSET(pipe_to_te_error[0], &rfd));
-				done = true;
 			}
 		}
 		kill(pid, SIGKILL);
 	}
 	else
 	{
+		// child
 		// Redirect STDIN.
 		assert(dup2(pipe_to_sh[0], 0) == 0);
 

@@ -75,13 +75,11 @@ void handle_events(const SDL_Event& event)
 						Ivec& last_pos = instances.back()->get_pos();
 						Ivec& last_size = instances.back()->get_size();
 						set_command(Settings::get_setting("compile"));
-						std::string out = wait_command();
 						TextBuffer* compile_buffer = new TextBuffer(
 							Ivec(last_pos.x + last_size.x / 2, last_pos.y),
-							Ivec(last_size.x / 2, last_size.y), 5, "",
-							SDL_Color{ 255, 255, 255, 255 },
+							Ivec(last_size.x / 2, last_size.y), 5,
+							get_out_stream(), SDL_Color{ 255, 255, 255, 255 },
 							SDL_Color{ 255, 0, 255, 255 });
-						compile_buffer->set_text(out);
 						push_instance(compile_buffer);
 						Instance::state = NORMAL;
 					}

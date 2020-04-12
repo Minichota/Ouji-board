@@ -9,7 +9,7 @@
 class TextBuffer : public Instance
 {
 	public:
-	TextBuffer(Ivec pos, Ivec size, short border_size, std::string data,
+	TextBuffer(Ivec pos, Ivec size, short border_size, char* data_read,
 			   SDL_Color border_color = { 255, 255, 255, 255 },
 			   SDL_Color font_color = { 255, 255, 255, 255 });
 	~TextBuffer();
@@ -21,10 +21,10 @@ class TextBuffer : public Instance
 	void handle_resize();
 
 	void set_text(std::string data);
-	void set_text(std::vector<std::string> data);
 
 	private:
-	std::vector<std::string> text;
+	std::string text;
+	char* data_read;
 	SDL_Color font_color;
 };
 
