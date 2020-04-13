@@ -17,7 +17,7 @@ class Instance
 	public:
 	Instance(Ivec pos, Ivec size, short border_size,
 			 SDL_Color border_color = { 255, 255, 255, 255 });
-	~Instance();
+	virtual ~Instance();
 	void thread_update();
 	virtual void update();
 	virtual void render();

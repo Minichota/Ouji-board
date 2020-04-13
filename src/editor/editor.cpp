@@ -24,10 +24,6 @@ animation(Ivec(pos.x + border_size, pos.y + border_size), 1000,
 	read(curr_file);
 }
 
-Editor::~Editor()
-{
-}
-
 void Editor::update()
 {
 	while((int)row - scroll_chars.x >= num_cells.x - 1)
@@ -406,7 +402,6 @@ void Editor::process_event(const SDL_Event& event)
 		break;
 		case COMMAND:
 		{
-			SDL_StopTextInput();
 			switch(event.key.keysym.sym)
 			{
 				case SDLK_r:
@@ -426,6 +421,7 @@ void Editor::process_event(const SDL_Event& event)
 				}
 				break;
 			}
+			SDL_StopTextInput();
 		}
 		break;
 	}

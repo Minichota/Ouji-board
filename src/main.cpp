@@ -3,6 +3,7 @@
 #include "animation.hpp"
 #include "editor.hpp"
 #include "fade-animation.hpp"
+#include "file-selector.hpp"
 #include "instance-control.hpp"
 #include "setting-editor.hpp"
 #include "system.hpp"
@@ -54,15 +55,10 @@ int main()
 	load_res();
 	Settings::update_settings();
 	Ivec instance_size = { window_size.x, window_size.y };
-	Editor win = Editor(Ivec(0, 0), Ivec(window_size.x, window_size.y), 5,
-						"res/test/test.cpp", SDL_Color{ 255, 255, 255, 255 },
-						SDL_Color{ 255, 255, 255, 255 });
-	push_instance(&win);
-
-	SettingEditor settings = SettingEditor(
-		Ivec(window_size.x / 2, 0), Ivec(window_size.x / 2, window_size.y), 5,
-		SDL_Color{ 255, 255, 255, 255 });
-	push_instance(&settings);
+	FileSelector fs =
+		FileSelector(Ivec(0, 0), Ivec(window_size.x, window_size.y), 5,
+					 SDL_Color{ 255, 255, 255, 255 });
+	push_instance(&fs);
 
 	current_instance = 0;
 	instances[current_instance]->active = true;

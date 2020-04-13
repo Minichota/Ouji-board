@@ -1,5 +1,6 @@
 #include "instance-control.hpp"
 
+#include "file-selector.hpp"
 #include "system.hpp"
 #include "terminal.hpp"
 #include "text-buffer.hpp"
@@ -85,6 +86,21 @@ void handle_events(const SDL_Event& event)
 					}
 				}
 				break;
+				case SDLK_f:
+				{
+					if(Instance::state == COMMAND)
+					{
+						Ivec& last_pos = instances.back()->get_pos();
+						Ivec& last_size = instances.back()->get_size();
+						FileSelector* file_selector = new FileSelector(
+							Ivec(last_pos.x + last_size.x / 2, last_pos.y),
+							Ivec(last_size.x / 2, last_size.y), 5,
+							SDL_Color{ 255, 255, 255, 255 });
+						push_instance(file_selector);
+						Instance::state = NORMAL;
+					}
+				}
+				break;
 				case SDLK_SPACE:
 				{
 					const uint8_t* keys = SDL_GetKeyboardState(NULL);
@@ -100,6 +116,37 @@ void handle_events(const SDL_Event& event)
 				}
 				break;
 			}
+		}
+	}
+}
+
+int find_instance(Instance* instance)
+{
+	for(size_t i = 0; i < instances.size(); i++)
+	{
+		if(instance == instances[i])
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void switch_instance(Instance* prev, Instance* next)
+{
+	for(size_t i = 0; i < instances.size(); i++)
+	{
+		if(instances[i] == prev)
+		{
+			Ivec last_pos = instances[i]->get_pos();
+			Ivec last_size = instances[i]->get_size();
+			instances.erase(instances.begin() + i);
+			instances.push_back(next);
+			Ivec& pos = next->get_pos();
+			Ivec& size = next->get_size();
+			pos = last_pos;
+			size = last_size;
+			next->active = true;
 		}
 	}
 }

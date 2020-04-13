@@ -12,7 +12,6 @@ class Editor : public Instance
 	public:
 	Editor(Ivec pos, Ivec size, short border_size, std::string file,
 		   SDL_Color border_color, SDL_Color font_color);
-	~Editor();
 
 	void update() override;
 	void render() override;
