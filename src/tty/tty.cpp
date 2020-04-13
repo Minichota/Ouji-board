@@ -66,49 +66,46 @@ void tty_loop()
 	{
 		while(active)
 		{
-			if(*command.load() != '\0')
+			write(pipe_to_sh[1], command.load(), strlen(command.load()));
+			write(pipe_to_sh[1], "\n", 1);
+
+			memset(command.load(), 0, 1024);
+
+			// parent
+			char c;
+			fd_set rfd;
+			fd_set wfd;
+			fd_set efd;
+			timeval tv;
+
+			// exit
+			do
 			{
-				write(pipe_to_sh[1], command.load(), strlen(command.load()));
-				write(pipe_to_sh[1], "\n", 1);
+				FD_ZERO(&rfd);
+				FD_ZERO(&wfd);
+				FD_ZERO(&efd);
+				FD_SET(pipe_to_te[0], &rfd);
+				FD_SET(pipe_to_te_error[0], &rfd);
+				tv.tv_sec = 0;
+				tv.tv_usec = 100000;
+				select(100, &rfd, &wfd, &efd, &tv);
 
-				memset(command.load(), 0, 1024);
-
-				// parent
-				char c;
-				fd_set rfd;
-				fd_set wfd;
-				fd_set efd;
-				timeval tv;
-
-				// exit
-				do
+				if(FD_ISSET(pipe_to_te[0], &rfd))
 				{
-					FD_ZERO(&rfd);
-					FD_ZERO(&wfd);
-					FD_ZERO(&efd);
-					FD_SET(pipe_to_te[0], &rfd);
-					FD_SET(pipe_to_te_error[0], &rfd);
-					tv.tv_sec = 0;
-					tv.tv_usec = 100000;
-					select(100, &rfd, &wfd, &efd, &tv);
+					read(pipe_to_te[0], &c, 1);
+					int len = strlen(out);
+					out[len] = c;
+					out[len + 1] = '\0';
+				}
 
-					if(FD_ISSET(pipe_to_te[0], &rfd))
-					{
-						read(pipe_to_te[0], &c, 1);
-						int len = strlen(out);
-						out[len] = c;
-						out[len + 1] = '\0';
-					}
-
-					// Check for data on the STDERR pipe
-					if(FD_ISSET(pipe_to_te_error[0], &rfd))
-					{
-						read(pipe_to_te_error[0], &c, 1);
-						error_out.push_back(c);
-					}
-				} while(FD_ISSET(pipe_to_te[0], &rfd) ||
-						FD_ISSET(pipe_to_te_error[0], &rfd));
-			}
+				// Check for data on the STDERR pipe
+				if(FD_ISSET(pipe_to_te_error[0], &rfd))
+				{
+					read(pipe_to_te_error[0], &c, 1);
+					error_out.push_back(c);
+				}
+			} while(FD_ISSET(pipe_to_te[0], &rfd) ||
+					FD_ISSET(pipe_to_te_error[0], &rfd));
 		}
 		kill(pid, SIGKILL);
 	}
