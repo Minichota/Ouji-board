@@ -31,13 +31,13 @@ void Terminal::update()
 		{
 			output.pop_back();
 		}
-		this->text.push_back(text[0]);
 		for(std::string s : output)
 		{
 			this->text.push_back(s);
 
 			constexpr char ESC = (char)27;
-			std::string clear_seq = std::string() + ESC + "[H" + ESC + "[2J";
+			static std::string clear_seq =
+				std::string() + ESC + "[H" + ESC + "[2J";
 
 			if(s == clear_seq)
 			{
@@ -46,7 +46,6 @@ void Terminal::update()
 				this->text.emplace_back();
 			}
 		}
-		this->text[0].clear();
 		this->changed = true;
 	}
 }
@@ -66,7 +65,7 @@ void Terminal::render()
 		TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
 		SDL_Texture* render_complete = SDL_CreateTexture(
 			SDL::renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-			(size.x - border_size), (size.y - border_size));
+			(size.x - border_size * 2), (size.y - border_size * 2));
 		SDL_SetRenderTarget(SDL::renderer, render_complete);
 		for(size_t i = 0; i < text.size(); i++)
 		{
@@ -89,7 +88,8 @@ void Terminal::render()
 	if(render_texture != nullptr)
 	{
 		SDL_Rect dest_rect = { pos.x + border_size, pos.y + border_size,
-							   (size.x - border_size), (size.y - border_size) };
+							   (size.x - border_size * 2),
+							   (size.y - border_size * 2) };
 		SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &dest_rect);
 	}
 	// rendering cursor
@@ -129,6 +129,9 @@ void Terminal::process_event(const SDL_Event& event)
 						case SDLK_RETURN:
 						{
 							set_command(text[0]);
+							this->text.push_back(text[0]);
+							this->text[0].clear();
+							this->changed = true;
 						}
 						break;
 						case SDLK_BACKSPACE:
