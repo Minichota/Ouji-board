@@ -82,7 +82,6 @@ void TextBuffer::handle_resize()
 		   texture_size)
 		{
 			// reset text
-			std::cout << "set text" << std::endl;
 			set_text(text);
 		}
 	}

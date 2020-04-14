@@ -6,6 +6,8 @@
 #include "text-buffer.hpp"
 #include "tty.hpp"
 
+static tty_instance* tty = create_tty();
+
 void handle_events(const SDL_Event& event)
 {
 	switch(event.type)
@@ -75,11 +77,11 @@ void handle_events(const SDL_Event& event)
 					{
 						Ivec& last_pos = instances.back()->get_pos();
 						Ivec& last_size = instances.back()->get_size();
-						set_command(Settings::get_setting("compile"));
+						set_command(tty, Settings::get_setting("compile"));
 						TextBuffer* compile_buffer = new TextBuffer(
 							Ivec(last_pos.x + last_size.x / 2, last_pos.y),
-							Ivec(last_size.x / 2, last_size.y), 5,
-							get_out_stream(), SDL_Color{ 255, 255, 255, 255 },
+							Ivec(last_size.x / 2, last_size.y), 5, tty->out,
+							SDL_Color{ 255, 255, 255, 255 },
 							SDL_Color{ 255, 0, 255, 255 });
 						push_instance(compile_buffer);
 						Instance::state = NORMAL;
@@ -101,6 +103,22 @@ void handle_events(const SDL_Event& event)
 					}
 				}
 				break;
+				case SDLK_t:
+				{
+					if(Instance::state == COMMAND)
+					{
+						Ivec& last_pos = instances.back()->get_pos();
+						Ivec& last_size = instances.back()->get_size();
+						Terminal* terminal = new Terminal(
+							Ivec(last_pos.x + last_size.x / 2, last_pos.y),
+							Ivec(last_size.x / 2, last_size.y), 5,
+							SDL_Color{ 255, 255, 255, 255 },
+							SDL_Color{ 255, 255, 255, 255 });
+						push_instance(terminal);
+						Instance::state = NORMAL;
+					}
+				}
+				break;
 				case SDLK_SPACE:
 				{
 					const uint8_t* keys = SDL_GetKeyboardState(NULL);
@@ -118,6 +136,11 @@ void handle_events(const SDL_Event& event)
 			}
 		}
 	}
+}
+
+void close_all_instances()
+{
+	stop_tty(tty);
 }
 
 int find_instance(Instance* instance)

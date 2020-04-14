@@ -68,8 +68,6 @@ int main()
 	size_t command_cache = Resources::cache_text(Resources::create_text(
 		"COMMAND MODE", Resources::MONO, SDL_Color{ 255, 255, 255, 255 }));
 
-	start_tty();
-
 	while(true)
 	{
 		if(!process_events())
@@ -117,6 +115,6 @@ int main()
 
 	clear_res();
 	clear_sdl();
-	stop_tty();
+	close_all_instances();
 	return 0;
 }

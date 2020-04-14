@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "instance.hpp"
+#include "tty.hpp"
 
 class Terminal : public Instance
 {
@@ -28,6 +29,8 @@ class Terminal : public Instance
 	TTF_Font* font;
 	SDL_Color font_color;
 	bool changed;
+
+	tty_instance* tty;
 };
 
 #endif

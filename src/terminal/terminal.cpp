@@ -1,6 +1,5 @@
 #include "terminal.hpp"
 #include "system.hpp"
-#include "tty.hpp"
 
 #include <unistd.h>
 
@@ -13,17 +12,19 @@ Instance(pos, size, border_size, border_color)
 	this->changed = true;
 	SDL_StartTextInput();
 	this->text.emplace_back();
+	this->tty = create_tty();
 }
 
 Terminal::~Terminal()
 {
 	SDL_DestroyTexture(render_texture);
+	stop_tty(tty);
 }
 
 void Terminal::update()
 {
 	// loads text with new information from tty
-	std::string tty_out = read_command();
+	std::string tty_out = read_command(tty);
 	if(!tty_out.empty())
 	{
 		std::vector<std::string> output = Util::split_string(tty_out, '\n');
@@ -128,7 +129,7 @@ void Terminal::process_event(const SDL_Event& event)
 					{
 						case SDLK_RETURN:
 						{
-							set_command(text[0]);
+							set_command(tty, text[0]);
 							this->text.push_back(text[0]);
 							this->text[0].clear();
 							this->changed = true;

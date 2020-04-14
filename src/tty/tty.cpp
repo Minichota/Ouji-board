@@ -12,37 +12,28 @@
 #include <thread>
 #include <unistd.h>
 
-char* const out = (char*)malloc(10000);
-std::string error_out;
-std::atomic<char*> command;
-static bool active = true;
-
-void set_command(std::string comm)
+void set_command(tty_instance* tty, std::string comm)
 {
-	strcpy(command.load(), comm.c_str());
+	memcpy(tty->command, comm.c_str(), 1024);
 }
 
-std::string read_command()
+std::string read_command(tty_instance* tty)
 {
-	std::string out_copy = out;
-	memset(out, 0, 10000);
-	if(!error_out.empty())
+	std::string out_copy = tty->out;
+	memset(tty->out, 0, 1024);
+	if(!tty->error_out.empty())
 	{
 		out_copy.append("Errors include:\n");
-		out_copy.append(error_out.c_str());
-		error_out.clear();
+		out_copy.append(tty->error_out.c_str());
+		tty->error_out.clear();
 	}
 	return out_copy;
 }
 
-char* get_out_stream()
+void tty_loop(tty_instance* tty)
 {
-	return out;
-}
-
-void tty_loop()
-{
-	command = (char*)malloc(1024);
+	memset(tty->command, 0, 1024);
+	memset(tty->out, 0, 1024);
 
 	int pipe_to_sh[2];
 	int pipe_to_te[2];
@@ -64,12 +55,12 @@ void tty_loop()
 
 	if(pid != 0)
 	{
-		while(active)
+		while(tty->active)
 		{
-			write(pipe_to_sh[1], command.load(), strlen(command.load()));
+			write(pipe_to_sh[1], tty->command, strlen(tty->command));
 			write(pipe_to_sh[1], "\n", 1);
 
-			memset(command.load(), 0, 1024);
+			memset(tty->command, 0, 1024);
 
 			// parent
 			char c;
@@ -93,16 +84,16 @@ void tty_loop()
 				if(FD_ISSET(pipe_to_te[0], &rfd))
 				{
 					read(pipe_to_te[0], &c, 1);
-					int len = strlen(out);
-					out[len] = c;
-					out[len + 1] = '\0';
+					int len = strlen(tty->out);
+					tty->out[len] = c;
+					tty->out[len + 1] = '\0';
 				}
 
 				// Check for data on the STDERR pipe
 				if(FD_ISSET(pipe_to_te_error[0], &rfd))
 				{
 					read(pipe_to_te_error[0], &c, 1);
-					error_out.push_back(c);
+					tty->error_out.push_back(c);
 				}
 			} while(FD_ISSET(pipe_to_te[0], &rfd) ||
 					FD_ISSET(pipe_to_te_error[0], &rfd));
@@ -122,18 +113,18 @@ void tty_loop()
 		assert(dup2(pipe_to_te_error[1], 2) == 2);
 		execlp("zsh", "/bin/zsh", NULL);
 	}
-	free(command);
 }
 
-std::thread tty_thread;
-
-void start_tty()
+tty_instance* create_tty()
 {
-	tty_thread = std::thread(&tty_loop);
+	tty_instance* tty = new tty_instance;
+	*tty->out = 0;
+	tty->thread = std::thread(&tty_loop, tty);
+	return tty;
 }
 
-void stop_tty()
+void stop_tty(tty_instance* tty)
 {
-	active = false;
-	tty_thread.join();
+	tty->active = false;
+	tty->thread.join();
 }

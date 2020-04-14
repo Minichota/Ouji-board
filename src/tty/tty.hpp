@@ -2,12 +2,21 @@
 #define TTY_HPP
 
 #include <string>
+#include <thread>
 
-void set_command(std::string comm);
-std::string read_command();
-char* get_out_stream();
-void tty_loop();
-void start_tty();
-void stop_tty();
+struct tty_instance
+{
+	std::thread thread;
+	bool active = true;
+	char out[1024];
+	std::string error_out = "";
+	char command[1024];
+};
+
+void set_command(tty_instance* tty, std::string comm);
+std::string read_command(tty_instance* tty);
+void tty_loop(tty_instance* instance);
+tty_instance* create_tty();
+void stop_tty(tty_instance* thread);
 
 #endif

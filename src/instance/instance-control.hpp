@@ -8,6 +8,7 @@
 
 void handle_events(const SDL_Event& event);
 
+void close_all_instances();
 int find_instance(Instance* instance);
 void switch_instance(Instance* prev, Instance* next);
 void push_instance(Instance* instance);
