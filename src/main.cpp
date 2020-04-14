@@ -55,10 +55,10 @@ int main()
 	load_res();
 	Settings::update_settings();
 	Ivec instance_size = { window_size.x, window_size.y };
-	FileSelector fs =
-		FileSelector(Ivec(0, 0), Ivec(window_size.x, window_size.y), 5,
-					 SDL_Color{ 255, 255, 255, 255 });
-	push_instance(&fs);
+	FileSelector* fs =
+		new FileSelector(Ivec(0, 0), Ivec(window_size.x, window_size.y), 5,
+						 SDL_Color{ 255, 255, 255, 255 });
+	push_instance(fs);
 
 	current_instance = 0;
 	instances[current_instance]->active = true;
@@ -113,8 +113,9 @@ int main()
 		SDL_Delay(1000.0f / 144.0f);
 	}
 
+	delete fs;
+	close_all_instances();
 	clear_res();
 	clear_sdl();
-	close_all_instances();
 	return 0;
 }
