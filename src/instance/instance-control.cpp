@@ -1,6 +1,7 @@
 #include "instance-control.hpp"
 
 #include "file-selector.hpp"
+#include "setting-editor.hpp"
 #include "system.hpp"
 #include "terminal.hpp"
 #include "text-buffer.hpp"
@@ -71,7 +72,7 @@ void handle_events(const SDL_Event& event)
 					}
 				}
 				break;
-				case SDLK_c:
+				case SDLK_c: //////// COMPILE
 				{
 					if(Instance::state == COMMAND)
 					{
@@ -88,7 +89,7 @@ void handle_events(const SDL_Event& event)
 					}
 				}
 				break;
-				case SDLK_f:
+				case SDLK_f: //////// FILES
 				{
 					if(Instance::state == COMMAND)
 					{
@@ -103,7 +104,7 @@ void handle_events(const SDL_Event& event)
 					}
 				}
 				break;
-				case SDLK_t:
+				case SDLK_t: //////// TERMINAL
 				{
 					if(Instance::state == COMMAND)
 					{
@@ -115,6 +116,21 @@ void handle_events(const SDL_Event& event)
 							SDL_Color{ 255, 255, 255, 255 },
 							SDL_Color{ 255, 255, 255, 255 });
 						push_instance(terminal);
+						Instance::state = NORMAL;
+					}
+				}
+				break;
+				case SDLK_0: //////// SETTINGS
+				{
+					if(Instance::state == COMMAND)
+					{
+						Ivec& last_pos = instances.back()->get_pos();
+						Ivec& last_size = instances.back()->get_size();
+						SettingEditor* setting_editor = new SettingEditor(
+							Ivec(last_pos.x + last_size.x / 2, last_pos.y),
+							Ivec(last_size.x / 2, last_size.y), 5,
+							SDL_Color{ 255, 255, 255, 255 });
+						push_instance(setting_editor);
 						Instance::state = NORMAL;
 					}
 				}
@@ -188,6 +204,7 @@ void push_instance(Instance* instance)
 void remove_instance(size_t index)
 {
 	Ivec old_size = instances[index]->get_size();
+	delete instances[index];
 	instances.erase(instances.begin() + index);
 	Ivec& last_size = instances.back()->get_size();
 	instances.back()->active = true;

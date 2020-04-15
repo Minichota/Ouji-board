@@ -13,6 +13,8 @@ Instance(pos, size, border_size, border_color)
 
 TextBuffer::~TextBuffer()
 {
+	// clear data_read on close
+	*data_read = '\0';
 }
 
 void TextBuffer::update()
@@ -34,6 +36,32 @@ void TextBuffer::render()
 
 void TextBuffer::process_event(const SDL_Event& event)
 {
+	switch(Instance::state)
+	{
+		case NORMAL:
+		{
+			switch(event.type)
+			{
+				case SDL_KEYDOWN:
+				{
+					switch(event.key.keysym.sym)
+					{
+						case SDLK_c:
+						{
+							*data_read = '\0';
+						}
+						break;
+					}
+				}
+				break;
+			}
+		}
+		break;
+		case COMMAND:
+		{
+		}
+		break;
+	}
 }
 
 void TextBuffer::set_text(std::string data)
@@ -69,6 +97,7 @@ void TextBuffer::set_text(std::string data)
 
 	SDL_SetRenderTarget(SDL::renderer, NULL);
 	this->render_texture = render_complete;
+	this->text = data;
 }
 
 void TextBuffer::handle_resize()

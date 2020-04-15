@@ -104,7 +104,7 @@ void load_res()
 {
 	for(std::string font_path : font_paths)
 	{
-		fonts.push_back(TTF_OpenFont(font_path.c_str(), 14));
+		fonts.push_back(TTF_OpenFont(font_path.c_str(), 18));
 	}
 }
 void clear_res()

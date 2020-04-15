@@ -1,2 +1,2 @@
+compile=g++ res/test/test.cpp && echo "Compile completed with exit code: $?"
 volume=0
-compile=make

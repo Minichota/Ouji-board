@@ -25,3 +25,8 @@ void Animation::global_render()
 		animation->render();
 	}
 }
+
+void Animation::set_pos(Ivec pos)
+{
+	this->pos = pos;
+}

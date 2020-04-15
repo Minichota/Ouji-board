@@ -24,8 +24,8 @@ class TextBuffer : public Instance
 
 	private:
 	std::string text;
-	char* data_read;
 	SDL_Color font_color;
+	char* data_read;
 };
 
 #endif

@@ -155,6 +155,7 @@ void FileSelector::process_event(const SDL_Event& event)
 											   SDL_Color{ 255, 255, 255, 255 },
 											   SDL_Color{ 255, 255, 255, 255 });
 								switch_instance(this, editor);
+								editor->active = true;
 							}
 							this->changed = true;
 							this->sel_file = 0;

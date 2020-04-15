@@ -16,6 +16,8 @@ class Animation
 
 	static void global_render();
 
+	void set_pos(Ivec pos);
+
 	protected:
 	static std::vector<Animation*> animations;
 

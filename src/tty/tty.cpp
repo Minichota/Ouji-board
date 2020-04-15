@@ -21,12 +21,6 @@ std::string read_command(tty_instance* tty)
 {
 	std::string out_copy = tty->out;
 	memset(tty->out, 0, 1024);
-	if(!tty->error_out.empty())
-	{
-		out_copy.append("Errors include:\n");
-		out_copy.append(tty->error_out.c_str());
-		tty->error_out.clear();
-	}
 	return out_copy;
 }
 
@@ -97,6 +91,15 @@ void tty_loop(tty_instance* tty)
 				}
 			} while(FD_ISSET(pipe_to_te[0], &rfd) ||
 					FD_ISSET(pipe_to_te_error[0], &rfd));
+			// appending error_out
+			size_t len = strlen(tty->out);
+			for(size_t i = 0; i < tty->error_out.size(); i++)
+			{
+				tty->out[len + i] = tty->error_out[i];
+			}
+			tty->out[len + tty->error_out.size()] = '\0';
+
+			tty->error_out.clear();
 		}
 		kill(pid, SIGKILL);
 	}
