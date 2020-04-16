@@ -27,6 +27,7 @@ class Editor : public Instance
 	std::string curr_file;
 	std::vector<std::string> text;
 	size_t col, row;
+	size_t prev_col;
 	TTF_Font* font;
 	SDL_Color font_color;
 	FadeAnimation animation;

@@ -45,6 +45,8 @@ enum font_type
 	MONO = 0
 };
 SDL_Texture* create_text(std::string text, font_type font, SDL_Color color);
+SDL_Texture* create_shaded_text(std::string text, font_type font,
+								SDL_Color fg_color, SDL_Color bg_color);
 TTF_Font* get_font(font_type type);
 };
 namespace Util

@@ -16,6 +16,7 @@ animation(Ivec(pos.x + border_size, pos.y + border_size), 1000,
 	this->changed = true;
 	this->row = 0;
 	this->col = 0;
+	this->prev_col = 0;
 	SDL_StartTextInput();
 	this->scroll_chars = { 0, 0 };
 	this->curr_file = file;
@@ -67,7 +68,7 @@ void Editor::render()
 	// rendering cursor
 
 	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
-	if(changed && text.size() > 0)
+	if((changed && text.size() > 0) || col != prev_col)
 	{
 		this->num_cells = Ivec((size.x - border_size * 2) / glyph_size.x,
 							   (size.y - border_size * 2) / glyph_size.y);
@@ -86,8 +87,36 @@ void Editor::render()
 		// rendering each layer to blank texture
 		for(size_t i = 0; i < text.size(); i++)
 		{
-			SDL_Texture* texture_part =
-				Resources::create_text(text[i], Resources::MONO, font_color);
+			SDL_Texture* texture_part;
+			// TODO: fix this kindof hacky solution
+			if(i == col)
+			{
+				if(text[i].empty())
+				{
+					text[i].push_back(' ');
+					texture_part = Resources::create_shaded_text(
+						text[i], Resources::MONO,
+						{ (uint8_t)(255 - font_color.r),
+						  (uint8_t)(255 - font_color.g),
+						  (uint8_t)(255 - font_color.b) },
+						font_color);
+					text[i].pop_back();
+				}
+				else
+				{
+					texture_part = Resources::create_shaded_text(
+						text[i], Resources::MONO,
+						{ (uint8_t)(255 - font_color.r),
+						  (uint8_t)(255 - font_color.g),
+						  (uint8_t)(255 - font_color.b) },
+						font_color);
+				}
+			}
+			else
+			{
+				texture_part = Resources::create_text(text[i], Resources::MONO,
+													  font_color);
+			}
 			SDL_Rect line_pos;
 			SDL_QueryTexture(texture_part, nullptr, nullptr, &line_pos.w,
 							 &line_pos.h);
@@ -97,8 +126,9 @@ void Editor::render()
 			SDL_DestroyTexture(texture_part);
 		}
 		// assigning blank texture to classes texture and resetting renderer
-		this->render_texture = render_complete;
 		SDL_SetRenderTarget(SDL::renderer, NULL);
+		this->render_texture = render_complete;
+		this->prev_col = col;
 		this->changed = false;
 	}
 	if(render_texture != nullptr)
@@ -115,7 +145,9 @@ void Editor::render()
 							scroll_chars.y * glyph_size.y + border_size,
 						glyph_size.x, glyph_size.y };
 
-	SDL_SetRenderDrawColor(SDL::renderer, 255, 255, 255, 100);
+	SDL_SetRenderDrawColor(SDL::renderer, (uint8_t)(255 - font_color.r),
+						   (uint8_t)(255 - font_color.g),
+						   (uint8_t)(255 - font_color.b), 100);
 	SDL_SetRenderDrawBlendMode(SDL::renderer, SDL_BLENDMODE_BLEND);
 	if(active)
 	{
@@ -218,6 +250,16 @@ void Editor::process_event(const SDL_Event& event)
 									}
 								}
 							}
+							else if(keys[SDL_SCANCODE_LCTRL] &&
+									keys[SDL_SCANCODE_LSHIFT])
+							{
+								// moves column up
+								if(col != 0)
+								{
+									this->changed = true;
+									std::swap(text[col], text[col - 1]);
+								}
+							}
 						}
 						break;
 						case SDLK_UP:
@@ -247,6 +289,16 @@ void Editor::process_event(const SDL_Event& event)
 								if(row > text[col].size())
 								{
 									this->row = text[col].size();
+								}
+							}
+							else if(keys[SDL_SCANCODE_LCTRL] &&
+									keys[SDL_SCANCODE_LSHIFT])
+							{
+								// moves column up
+								if(col != text.size() - 1)
+								{
+									this->changed = true;
+									std::swap(text[col], text[col + 1]);
 								}
 							}
 						}

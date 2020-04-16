@@ -100,6 +100,16 @@ SDL_Texture* create_text(std::string text, font_type font, SDL_Color color)
 	return texture;
 }
 
+SDL_Texture* create_shaded_text(std::string text, font_type font,
+								SDL_Color fg_color, SDL_Color bg_color)
+{
+	SDL_Surface* surface = TTF_RenderText_Shaded(
+		Resources::get_font(font), text.c_str(), fg_color, bg_color);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(SDL::renderer, surface);
+	SDL_FreeSurface(surface);
+	return texture;
+}
+
 void load_res()
 {
 	for(std::string font_path : font_paths)
