@@ -181,10 +181,8 @@ void switch_instance(Instance* prev, Instance* next)
 			Ivec last_size = instances[i]->get_size();
 			instances.erase(instances.begin() + i);
 			instances.push_back(next);
-			Ivec& pos = next->get_pos();
-			Ivec& size = next->get_size();
-			pos = last_pos;
-			size = last_size;
+			next->set_pos(last_pos);
+			next->set_size(last_size);
 			next->active = true;
 		}
 	}
@@ -196,16 +194,16 @@ void push_instance(Instance* instance)
 	{
 		Ivec& last_pos = instances.back()->get_pos();
 		Ivec& last_size = instances.back()->get_size();
-		last_size = Ivec(last_size.x / 2, last_size.y);
+		instances.back()->set_size(Ivec(last_size.x / 2, last_size.y));
 		instances.back()->active = false;
-		instance->get_size() = last_size;
-		instance->get_pos() = Ivec(last_pos.x + last_size.x, last_pos.y);
-		instance->handle_resize();
+		instance->set_size(last_size);
+		instance->set_pos(Ivec(last_pos.x + last_size.x, last_pos.y));
 	}
 	else
 	{
-		instance->get_size() = SDL::window_size;
+		instance->set_size(SDL::window_size);
 	}
+	instance->handle_resize();
 	instances.push_back(instance);
 	instance->active = true;
 	current_instance = instances.size() - 1;
@@ -219,17 +217,30 @@ void remove_instance(size_t index)
 		TTF_Quit();
 		exit(0);
 	}
-	// copy size
+	// copy pos and size
+	Ivec removed_pos = instances[index]->get_pos();
 	Ivec removed_size = instances[index]->get_size();
+
 	// removal
 	delete instances[index];
 	instances.erase(instances.begin() + index);
 	if(instances.size() == 0)
 		return;
 
-	std::cout << index << std::endl;
-	instances[index - 1]->active = true;
-	current_instance = index - 1;
-	Ivec& last_size = instances[index - 1]->get_size();
-	last_size = Ivec(last_size.x + removed_size.x, last_size.y);
+	// size adjust
+	if(index != 0)
+	{
+		index--;
+	}
+	current_instance = index;
+	Ivec& last_pos = instances[index]->get_pos();
+	Ivec& last_size = instances[index]->get_size();
+	instances[index]->active = true;
+	instances[index]->set_size(Ivec(last_size.x + removed_size.x, last_size.y));
+	instances[index]->handle_resize();
+	if(last_pos.x > removed_pos.x)
+	{
+		// when removed instance is left of growing instance
+		instances[index]->set_pos(removed_pos);
+	}
 }

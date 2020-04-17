@@ -36,6 +36,14 @@ class Instance
 	{
 		return this->size;
 	}
+	void set_pos(Ivec pos)
+	{
+		this->pos = pos;
+	}
+	void set_size(Ivec size)
+	{
+		this->size = size;
+	}
 
 	bool active;
 
