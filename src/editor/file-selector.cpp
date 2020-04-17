@@ -17,7 +17,8 @@ Instance(pos, size, border_size, border_color)
 	this->sel_file = 0;
 	SDL_StartTextInput();
 	this->changed = true;
-	this->num_files = scandir(current_path.c_str(), &paths, 0, versionsort);
+	this->num_files = scandir(current_path.c_str(), &dirents, 0, versionsort);
+	this->dirents[num_files] = nullptr;
 	this->scroll_pos = 0;
 	if(num_files < 0)
 		printf("[IO] Failed to open directory");
@@ -26,7 +27,11 @@ Instance(pos, size, border_size, border_color)
 void FileSelector::update()
 {
 	static Ivec glyph_size;
-	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
+	if(!glyph_size)
+	{
+		// only call once
+		TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
+	}
 	while(sel_file - scroll_pos >= size.y / glyph_size.y)
 	{
 		this->scroll_pos++;
@@ -54,7 +59,7 @@ void FileSelector::render()
 		for(int i = 0; i < num_files; i++)
 		{
 			SDL_Texture* texture_part = Resources::create_text(
-				paths[i]->d_name, Resources::MONO,
+				dirents[i]->d_name, Resources::MONO,
 				i == sel_file ? SDL_Color{ 0, 0, 255, 255 }
 							  : SDL_Color{ 255, 255, 255, 255 });
 			SDL_Rect line_pos;
@@ -122,17 +127,14 @@ void FileSelector::process_event(const SDL_Event& event)
 						break;
 						case SDLK_RETURN:
 						{
-							this->current_path.append(std::string("/") +
-													  paths[sel_file]->d_name);
+							this->current_path.append(
+								std::string("/") + dirents[sel_file]->d_name);
 							// cleanup
-							dirent* c;
-							c = *paths;
-							while(c != nullptr)
+							for(int i = 0; i < num_files; i++)
 							{
-								delete c;
-								c++;
+								delete dirents[i];
 							}
-							delete paths;
+							delete dirents;
 
 							struct stat file_spec;
 							if(stat(current_path.c_str(), &file_spec) < 0)
@@ -140,8 +142,9 @@ void FileSelector::process_event(const SDL_Event& event)
 							if(S_ISDIR(file_spec.st_mode))
 							{
 								this->num_files =
-									scandir(current_path.c_str(), &paths, 0,
+									scandir(current_path.c_str(), &dirents, 0,
 											versionsort);
+								this->dirents[num_files] = nullptr;
 								if(num_files < 0)
 									printf("[IO] Failed to open directory");
 							}

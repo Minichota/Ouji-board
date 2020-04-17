@@ -28,6 +28,11 @@ class Vector
 	{
 	}
 
+	bool operator!()
+	{
+		return x == 0 && y == 0;
+	}
+
 	friend std::ostream& operator<<(std::ostream& os, const Vector& x)
 	{
 		os << " x: " << x.x << " y: " << x.y << " ";

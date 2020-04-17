@@ -114,7 +114,12 @@ void load_res()
 {
 	for(std::string font_path : font_paths)
 	{
-		fonts.push_back(TTF_OpenFont(font_path.c_str(), 18));
+		TTF_Font* font = TTF_OpenFont(font_path.c_str(), 18);
+		if(!font)
+		{
+			printf("[TTF] Failed to load font: %s", font_path.c_str());
+		}
+		fonts.push_back(font);
 	}
 }
 void clear_res()

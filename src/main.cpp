@@ -45,7 +45,8 @@ static bool process_events()
 		}
 		handle_events(event);
 
-		instances[current_instance]->process_event(event);
+		if(!instances.empty())
+			instances[current_instance]->process_event(event);
 	}
 	return true;
 }
@@ -113,7 +114,6 @@ int main()
 		SDL_Delay(1000.0f / 144.0f);
 	}
 
-	delete fs;
 	close_all_instances();
 	clear_res();
 	clear_sdl();

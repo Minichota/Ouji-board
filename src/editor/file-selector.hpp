@@ -16,7 +16,7 @@ class FileSelector : public Instance
 	void handle_resize() override;
 
 	private:
-	dirent** paths;
+	dirent** dirents;
 	std::string current_path;
 	TTF_Font* font;
 
