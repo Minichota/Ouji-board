@@ -127,38 +127,39 @@ void FileSelector::process_event(const SDL_Event& event)
 						break;
 						case SDLK_RETURN:
 						{
+							std::string prev_path = current_path;
 							this->current_path.append(
 								std::string("/") + dirents[sel_file]->d_name);
-							// cleanup
-							for(int i = 0; i < num_files; i++)
-							{
-								delete dirents[i];
-							}
-							delete dirents;
 
 							struct stat file_spec;
 							if(stat(current_path.c_str(), &file_spec) < 0)
 								printf("[IO] Failed to check file description");
-							if(S_ISDIR(file_spec.st_mode))
+							if(!S_ISDIR(file_spec.st_mode))
 							{
+								// create editor if is file
+								Editor* editor =
+									new Editor(Ivec(0, 0), SDL::window_size, 5,
+											   current_path,
+											   SDL_Color{ 255, 255, 255, 255 },
+											   SDL_Color{ 255, 255, 255, 255 });
+								push_instance(editor);
+								this->current_path = prev_path;
+							}
+							else
+							{
+								// remove old directories
+								for(int i = 0; i < num_files; i++)
+								{
+									delete dirents[i];
+								}
+								delete dirents;
+								// add new directories
 								this->num_files =
 									scandir(current_path.c_str(), &dirents, 0,
 											versionsort);
 								this->dirents[num_files] = nullptr;
 								if(num_files < 0)
 									printf("[IO] Failed to open directory");
-							}
-							else
-							{
-								Editor* editor =
-									new Editor(Ivec(SDL::window_size.x / 2, 0),
-											   Ivec(SDL::window_size.x / 2,
-													SDL::window_size.y),
-											   5, current_path,
-											   SDL_Color{ 255, 255, 255, 255 },
-											   SDL_Color{ 255, 255, 255, 255 });
-								switch_instance(this, editor);
-								editor->active = true;
 							}
 							this->changed = true;
 							this->sel_file = 0;
