@@ -11,6 +11,7 @@ static tty_instance* tty = create_tty();
 
 void handle_events(const SDL_Event& event)
 {
+	const uint8_t* keys = SDL_GetKeyboardState(NULL);
 	switch(event.type)
 	{
 		case SDL_MOUSEBUTTONDOWN:
@@ -69,6 +70,12 @@ void handle_events(const SDL_Event& event)
 					{
 						remove_instance(current_instance);
 						Instance::state = NORMAL;
+					}
+					else if(keys[SDL_SCANCODE_LCTRL])
+					{
+						SDL_Quit();
+						TTF_Quit();
+						exit(0);
 					}
 				}
 				break;
