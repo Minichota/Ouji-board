@@ -195,7 +195,7 @@ void push_instance(Instance* instance)
 		Ivec& last_pos = instances.back()->get_pos();
 		Ivec& last_size = instances.back()->get_size();
 		instances.back()->set_size(Ivec(last_size.x / 2, last_size.y));
-		instances.back()->active = false;
+		instances[current_instance]->active = false;
 		instance->set_size(last_size);
 		instance->set_pos(Ivec(last_pos.x + last_size.x, last_pos.y));
 	}
