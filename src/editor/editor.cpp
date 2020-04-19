@@ -2,6 +2,8 @@
 
 #include "editor.hpp"
 #include "system.hpp"
+#include "file-selector.hpp"
+#include "instance-control.hpp"
 
 Editor::Editor(Ivec pos, Ivec size, short border_size, std::string file,
 			   SDL_Color border_color, SDL_Color font_color) :
@@ -68,7 +70,7 @@ void Editor::render()
 	// rendering cursor
 
 	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
-	if((changed && text.size() > 0) || (col != prev_col && std::stoi(Settings::get_setting("highlight-line"))))
+	if((changed && text.size() > 0) || (col != prev_col && std::stoi(Settings::get_setting("highlight-line").value)))
 	{
 		this->num_cells = Ivec((size.x - border_size * 2) / glyph_size.x,
 							   (size.y - border_size * 2) / glyph_size.y);
@@ -88,7 +90,7 @@ void Editor::render()
 		for(size_t i = scroll_chars.y; i < text.size(); i++)
 		{
 			SDL_Texture* texture_part;
-			if(i == col && std::stoi(Settings::get_setting("highlight-line")))
+			if(i == col && std::stoi(Settings::get_setting("highlight-line").value))
 			{
 				text[i].push_back(' ');
 				texture_part = Resources::create_shaded_text(
@@ -137,9 +139,9 @@ void Editor::render()
 	};
 
 	SDL_SetRenderDrawColor(SDL::renderer,
-						   (uint8_t)(255 - font_color.r * std::stoi(Settings::get_setting("highlight-line"))),
-						   (uint8_t)(255 - font_color.g * std::stoi(Settings::get_setting("highlight-line"))),
-						   (uint8_t)(255 - font_color.b * std::stoi(Settings::get_setting("highlight-line"))),
+						   (uint8_t)(255 - font_color.r * std::stoi(Settings::get_setting("highlight-line").value)),
+						   (uint8_t)(255 - font_color.g * std::stoi(Settings::get_setting("highlight-line").value)),
+						   (uint8_t)(255 - font_color.b * std::stoi(Settings::get_setting("highlight-line").value)),
 						   100);
 	SDL_SetRenderDrawBlendMode(SDL::renderer, SDL_BLENDMODE_BLEND);
 	if(active)
@@ -201,6 +203,7 @@ void Editor::process_event(const SDL_Event& event)
 								else
 								{
 									text.erase(text.begin() + col + 1);
+									this->row = text[col].size();
 								}
 							}
 							this->changed = true;
@@ -463,6 +466,12 @@ void Editor::process_event(const SDL_Event& event)
 					save(curr_file);
 					Instance::state = NORMAL;
 					animation.activate();
+				}
+				break;
+				case SDLK_o:
+				{
+					FileSelector* fs = new FileSelector(Ivec(0,0), Ivec(0,0), 5);
+					switch_instance(this, fs);
 				}
 				break;
 			}

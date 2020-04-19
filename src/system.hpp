@@ -5,6 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <map>
 #include <vector>
+#include <functional>
 
 #include "instance.hpp"
 #include "vectors.hpp"
@@ -56,15 +57,19 @@ std::vector<std::string> split_string(const std::string& data,
 };
 namespace Settings
 {
+struct Setting
+{
+	std::string value;
+	std::function<void(std::string arg)> callback = nullptr;
+};
 static std::string settings_path = "res/settings/settings.ou";
-static std::map<std::string, std::string> setting_values = { { "volume", "0" },
-															 { "compile", "make all" },
-															 { "highlight-line", "0" } };
-std::string& get_setting(std::string setting_name);
-std::vector<std::pair<std::string, std::string>> get_all_settings();
+static std::map<std::string, Setting> setting_values = { { "volume", {"0"} },
+															 { "compile", {"make all"} },
+															 { "highlight-line", {"0"} } };
+Setting& get_setting(std::string setting_name);
+std::vector<std::pair<std::string, Setting>> get_all_settings();
 void update_settings();
-void save_settings(
-	std::vector<std::pair<std::string, std::string>> new_settings);
+void save_settings(std::vector<std::pair<std::string, Setting>> new_settings);
 };
 
 #endif

@@ -1,2 +1,3 @@
-compile=g++ res/test/test.cpp && echo "Compile completed with exit code: $?"
+compile=g++ res/test/test.cpp && echo "Compile completed with exit code: $?" && ./a.out
+highlight-line=0
 volume=0

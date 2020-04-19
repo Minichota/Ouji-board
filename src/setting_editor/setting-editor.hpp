@@ -7,6 +7,7 @@
 
 #include "fade-animation.hpp"
 #include "instance.hpp"
+#include "system.hpp"
 
 class SettingEditor : public Instance
 {
@@ -23,8 +24,8 @@ class SettingEditor : public Instance
 	void handle_resize() override;
 
 	private:
-	std::vector<std::pair<std::string, std::string>> setting_data;
 	FadeAnimation animation;
+	std::vector<std::pair<std::string, Settings::Setting>> data;
 
 	size_t selected_setting;
 

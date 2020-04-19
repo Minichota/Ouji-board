@@ -165,14 +165,13 @@ std::vector<std::string> split_string(const std::string& str,
 
 namespace Settings
 {
-std::string& get_setting(std::string setting_name)
+Setting& get_setting(std::string setting_name)
 {
 	return setting_values[setting_name];
 }
-std::vector<std::pair<std::string, std::string>> get_all_settings()
+std::vector<std::pair<std::string, Setting>> get_all_settings()
 {
-	return std::vector<std::pair<std::string, std::string>>(
-		setting_values.begin(), setting_values.end());
+	return std::vector<std::pair<std::string, Setting>>(setting_values.begin(), setting_values.end());
 }
 void update_settings()
 {
@@ -181,30 +180,29 @@ void update_settings()
 	while(getline(file, line))
 	{
 		std::vector<std::string> data = Util::split_string(line, '=');
-		std::map<std::string, std::string>::iterator replace =
-			setting_values.find(data[0]);
+		std::map<std::string, Setting>::iterator replace = setting_values.find(data[0]);
+
 		if(replace != setting_values.end())
 		{
 			// replace existing setting
-			replace->second = data[1];
+			replace->second = Setting{data[1], replace->second.callback};
 		}
 		else
 		{
 			// insert new setting
-			setting_values.insert(std::pair(data[0], data[1]));
+			setting_values.insert(std::pair(data[0], Setting{data[1]}));
 		}
 	}
 	file.close();
 }
 
-void save_settings(
-	std::vector<std::pair<std::string, std::string>> new_settings)
+void save_settings(std::vector<std::pair<std::string, Setting>> new_settings)
 {
 	std::ofstream file(settings_path);
 	std::string of_data;
-	for(std::pair<std::string, std::string> line : new_settings)
+	for(std::pair<std::string, Setting> line : new_settings)
 	{
-		of_data.append(line.first + "=" + line.second + "\n");
+		of_data.append(line.first + "=" + line.second.value + "\n");
 	}
 	file << of_data;
 	file.close();

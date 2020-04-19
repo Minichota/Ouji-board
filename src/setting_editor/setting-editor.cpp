@@ -1,16 +1,14 @@
 #include "setting-editor.hpp"
 
-#include "system.hpp"
-
 SettingEditor::SettingEditor(Ivec pos, Ivec size, short border_size,
 							 SDL_Color border_color) :
 Instance(pos, size, border_size, border_color),
 animation(Ivec(pos.x + border_size, pos.y + border_size), 1000,
 		  Resources::create_text("SAVED", Resources::MONO,
 								 SDL_Color{ 255, 255, 255, 255 }),
-		  SINGULAR)
+		  						 SINGULAR)
 {
-	this->setting_data = Settings::get_all_settings();
+	this->data = Settings::get_all_settings();
 	this->changed = true;
 	this->selected_setting = 0;
 	SDL_StartTextInput();
@@ -45,10 +43,10 @@ void SettingEditor::render()
 
 		int max_width = 0;
 
-		for(size_t i = 0; i < setting_data.size(); i++)
+		for(size_t i = 0; i < data.size(); i++)
 		{
 			SDL_Texture* texture = Resources::create_text(
-				setting_data[i].first + ":", Resources::MONO,
+				data[i].first + ":", Resources::MONO,
 				i == selected_setting ? SDL_Color{ 0, 0, 255, 255 }
 									  : SDL_Color{ 255, 255, 255, 255 });
 
@@ -64,12 +62,12 @@ void SettingEditor::render()
 
 			SDL_DestroyTexture(texture);
 		}
-		for(size_t i = 0; i < setting_data.size(); i++)
+		for(size_t i = 0; i < data.size(); i++)
 		{
-			if(setting_data[i].second.size() > 0)
+			if(data[i].second.value.size() > 0)
 			{
 				SDL_Texture* texture = Resources::create_text(
-					setting_data[i].second, Resources::MONO,
+					data[i].second.value, Resources::MONO,
 					SDL_Color{ 255, 255, 255, 255 });
 
 				SDL_Rect render_rect = { max_width + glyph_size.x,
@@ -107,8 +105,7 @@ void SettingEditor::process_event(const SDL_Event& event)
 			{
 				case SDL_TEXTINPUT:
 				{
-					this->setting_data[selected_setting].second.append(
-						event.text.text);
+					this->data[selected_setting].second.value.append(event.text.text);
 					this->changed = true;
 				}
 				break;
@@ -122,7 +119,7 @@ void SettingEditor::process_event(const SDL_Event& event)
 							if(keys[SDL_SCANCODE_LCTRL])
 							{
 								this->selected_setting++;
-								if(selected_setting > setting_data.size() - 1)
+								if(selected_setting > data.size() - 1)
 								{
 									this->selected_setting = 0;
 								}
@@ -136,8 +133,7 @@ void SettingEditor::process_event(const SDL_Event& event)
 							{
 								if(selected_setting == 0)
 								{
-									this->selected_setting =
-										setting_data.size() - 1;
+									this->selected_setting = data.size() - 1;
 								}
 								else
 								{
@@ -149,17 +145,23 @@ void SettingEditor::process_event(const SDL_Event& event)
 						break;
 						case SDLK_BACKSPACE:
 						{
-							if(setting_data[selected_setting].second.size() > 0)
+							if(data[selected_setting].second.value.size() > 0)
 							{
-								this->setting_data[selected_setting]
-									.second.pop_back();
+								this->data[selected_setting].second.value.pop_back();
 								this->changed = true;
 							}
 						}
 						break;
 						case SDLK_RETURN:
 						{
-							Settings::save_settings(setting_data);
+							Settings::save_settings(data);
+							for(std::pair<std::string, Settings::Setting> setting : data)
+							{
+								if(setting.second.callback != nullptr)
+								{
+									setting.second.callback(setting.second.value);
+								}
+							}
 							Settings::update_settings();
 							animation.activate();
 						}
@@ -180,7 +182,7 @@ void SettingEditor::process_event(const SDL_Event& event)
 					{
 						case SDLK_r:
 						{
-							this->setting_data = Settings::get_all_settings();
+							this->data = Settings::get_all_settings();
 							this->changed = true;
 							Instance::state = NORMAL;
 						}

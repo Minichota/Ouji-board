@@ -23,6 +23,8 @@ class Editor : public Instance
 	void read(std::string path);
 	void save(std::string path);
 
+	bool changed;
+
 	private:
 	std::string curr_file;
 	std::vector<std::string> text;
@@ -36,7 +38,6 @@ class Editor : public Instance
 	Ivec glyph_size;
 	Ivec num_cells;
 
-	bool changed;
 };
 
 #endif

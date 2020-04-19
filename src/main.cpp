@@ -55,6 +55,18 @@ int main()
 	load_sdl();
 	load_res();
 	Settings::update_settings();
+	Settings::Setting& highlight_setting = Settings::get_setting("highlight-line");
+	highlight_setting.callback = [&](std::string args) -> void
+	{
+		for(Instance* instance : instances)
+		{
+			Editor* editor = dynamic_cast<Editor*>(instance);
+			if(editor != nullptr)
+			{
+				editor->changed = true;
+			}
+		}
+	};
 	Ivec instance_size = { window_size.x, window_size.y };
 	FileSelector* fs =
 		new FileSelector(Ivec(0, 0), Ivec(window_size.x, window_size.y), 5,

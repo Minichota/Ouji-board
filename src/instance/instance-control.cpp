@@ -87,7 +87,7 @@ void handle_events(const SDL_Event& event)
 				{
 					if(Instance::state == COMMAND)
 					{
-						set_command(tty, Settings::get_setting("compile"));
+						set_command(tty, Settings::get_setting("compile").value);
 						if(!compile_address)
 						{
 							compile_address = new TextBuffer(
