@@ -85,7 +85,7 @@ void Editor::render()
 		SDL_SetRenderTarget(SDL::renderer, render_complete);
 
 		// rendering each layer to blank texture
-		for(size_t i = 0; i < text.size(); i++)
+		for(size_t i = scroll_chars.y; i < text.size(); i++)
 		{
 			SDL_Texture* texture_part;
 			if(i == col)
