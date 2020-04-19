@@ -68,7 +68,7 @@ void Editor::render()
 	// rendering cursor
 
 	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
-	if((changed && text.size() > 0) || col != prev_col)
+	if((changed && text.size() > 0) || (col != prev_col && std::stoi(Settings::get_setting("highlight-line"))))
 	{
 		this->num_cells = Ivec((size.x - border_size * 2) / glyph_size.x,
 							   (size.y - border_size * 2) / glyph_size.y);
@@ -88,7 +88,7 @@ void Editor::render()
 		for(size_t i = scroll_chars.y; i < text.size(); i++)
 		{
 			SDL_Texture* texture_part;
-			if(i == col)
+			if(i == col && std::stoi(Settings::get_setting("highlight-line")))
 			{
 				text[i].push_back(' ');
 				texture_part = Resources::create_shaded_text(
@@ -137,9 +137,10 @@ void Editor::render()
 	};
 
 	SDL_SetRenderDrawColor(SDL::renderer,
-						   (uint8_t)(0),
-						   (uint8_t)(0),
-						   (uint8_t)(0), 100);
+						   (uint8_t)(255 - font_color.r * std::stoi(Settings::get_setting("highlight-line"))),
+						   (uint8_t)(255 - font_color.g * std::stoi(Settings::get_setting("highlight-line"))),
+						   (uint8_t)(255 - font_color.b * std::stoi(Settings::get_setting("highlight-line"))),
+						   100);
 	SDL_SetRenderDrawBlendMode(SDL::renderer, SDL_BLENDMODE_BLEND);
 	if(active)
 	{

@@ -58,8 +58,8 @@ namespace Settings
 {
 static std::string settings_path = "res/settings/settings.ou";
 static std::map<std::string, std::string> setting_values = { { "volume", "0" },
-															 { "compile",
-															   "make all" } };
+															 { "compile", "make all" },
+															 { "highlight-line", "0" } };
 std::string& get_setting(std::string setting_name);
 std::vector<std::pair<std::string, std::string>> get_all_settings();
 void update_settings();
