@@ -100,6 +100,11 @@ void TextBuffer::set_text(std::string data)
 	this->text = data;
 }
 
+void TextBuffer::clear()
+{
+	*data_read = '\0';
+}
+
 void TextBuffer::handle_resize()
 {
 	if(render_texture != nullptr)

@@ -1,5 +1,7 @@
 #include "instance-control.hpp"
 
+#include <algorithm>
+
 #include "file-selector.hpp"
 #include "setting-editor.hpp"
 #include "system.hpp"
@@ -8,6 +10,8 @@
 #include "tty.hpp"
 
 static tty_instance* tty = create_tty();
+static TextBuffer* compile_address = 0;
+static bool compile_open = false;
 
 void handle_events(const SDL_Event& event)
 {
@@ -84,11 +88,24 @@ void handle_events(const SDL_Event& event)
 					if(Instance::state == COMMAND)
 					{
 						set_command(tty, Settings::get_setting("compile"));
-						TextBuffer* compile_buffer = new TextBuffer(
-							Ivec(0, 0), SDL::window_size, 5, tty->out,
-							SDL_Color{ 255, 255, 255, 255 },
-							SDL_Color{ 255, 0, 255, 255 });
-						push_instance(compile_buffer);
+						if(!compile_address)
+						{
+							compile_address = new TextBuffer(
+								Ivec(0, 0), SDL::window_size, 5, tty->out,
+								SDL_Color{ 255, 255, 255, 255 },
+								SDL_Color{ 255, 0, 255, 255 });
+						}
+						int previous = current_instance;
+						if(!compile_open)
+							push_instance(compile_address);
+						// assures that compile isn't selected after cmd+c
+						current_instance = find_instance(instances[previous]);
+						instances[previous]->handle_resize();
+						instances[previous]->active = true;
+						compile_address->active = false;
+						// clear to remove potential previous text
+						compile_address->clear();
+						compile_open = true;
 						Instance::state = NORMAL;
 					}
 				}
@@ -179,11 +196,13 @@ void switch_instance(Instance* prev, Instance* next)
 		{
 			Ivec last_pos = instances[i]->get_pos();
 			Ivec last_size = instances[i]->get_size();
-			instances.erase(instances.begin() + i);
-			instances.push_back(next);
+			delete instances[i];
+			instances[i] = next;
 			next->set_pos(last_pos);
 			next->set_size(last_size);
 			next->active = true;
+			next->handle_resize();
+			current_instance = i;
 		}
 	}
 }
@@ -222,7 +241,14 @@ void remove_instance(size_t index)
 	Ivec removed_size = instances[index]->get_size();
 
 	// removal
-	delete instances[index];
+	if(instances[index] != compile_address)
+	{
+		delete instances[index];
+	}
+	else
+	{
+		compile_open = false;
+	}
 	instances.erase(instances.begin() + index);
 	if(instances.size() == 0)
 		return;
@@ -237,10 +263,10 @@ void remove_instance(size_t index)
 	Ivec& last_size = instances[index]->get_size();
 	instances[index]->active = true;
 	instances[index]->set_size(Ivec(last_size.x + removed_size.x, last_size.y));
-	instances[index]->handle_resize();
 	if(last_pos.x > removed_pos.x)
 	{
 		// when removed instance is left of growing instance
 		instances[index]->set_pos(removed_pos);
 	}
+	instances[index]->handle_resize();
 }

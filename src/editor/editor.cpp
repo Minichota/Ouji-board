@@ -492,10 +492,7 @@ void Editor::handle_resize()
 			this->changed = true;
 		}
 	}
-	else
-	{
-		animation.set_pos(pos + border_size);
-	}
+	animation.set_pos(pos + border_size);
 }
 
 void Editor::read(std::string path)

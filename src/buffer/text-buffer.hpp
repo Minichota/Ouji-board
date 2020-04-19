@@ -21,6 +21,7 @@ class TextBuffer : public Instance
 	void handle_resize();
 
 	void set_text(std::string data);
+	void clear();
 
 	private:
 	std::string text;

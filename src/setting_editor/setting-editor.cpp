@@ -208,8 +208,5 @@ void SettingEditor::handle_resize()
 			this->changed = true;
 		}
 	}
-	else
-	{
-		animation.set_pos(pos + border_size);
-	}
+	animation.set_pos(pos + border_size);
 }

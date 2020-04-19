@@ -95,6 +95,7 @@ void FileSelector::render()
 
 void FileSelector::process_event(const SDL_Event& event)
 {
+	const uint8_t* keys = SDL_GetKeyboardState(NULL);
 	switch(Instance::state)
 	{
 		case NORMAL:
@@ -142,7 +143,15 @@ void FileSelector::process_event(const SDL_Event& event)
 											   current_path,
 											   SDL_Color{ 255, 255, 255, 255 },
 											   SDL_Color{ 255, 255, 255, 255 });
-								push_instance(editor);
+								if(keys[SDL_SCANCODE_LSHIFT])
+								{
+									push_instance(editor);
+								}
+								else
+								{
+									switch_instance(this, editor);
+									return;
+								}
 								this->current_path = prev_path;
 							}
 							else
