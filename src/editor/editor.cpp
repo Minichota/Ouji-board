@@ -88,29 +88,16 @@ void Editor::render()
 		for(size_t i = 0; i < text.size(); i++)
 		{
 			SDL_Texture* texture_part;
-			// TODO: fix this kindof hacky solution
 			if(i == col)
 			{
-				if(text[i].empty())
-				{
-					text[i].push_back(' ');
-					texture_part = Resources::create_shaded_text(
-						text[i], Resources::MONO,
-						{ (uint8_t)(255 - font_color.r),
-						  (uint8_t)(255 - font_color.g),
-						  (uint8_t)(255 - font_color.b) },
-						font_color);
-					text[i].pop_back();
-				}
-				else
-				{
-					texture_part = Resources::create_shaded_text(
-						text[i], Resources::MONO,
-						{ (uint8_t)(255 - font_color.r),
-						  (uint8_t)(255 - font_color.g),
-						  (uint8_t)(255 - font_color.b) },
-						font_color);
-				}
+				text[i].push_back(' ');
+				texture_part = Resources::create_shaded_text(
+					text[i], Resources::MONO,
+					{ (uint8_t)(255 - font_color.r),
+					  (uint8_t)(255 - font_color.g),
+					  (uint8_t)(255 - font_color.b) },
+					font_color);
+				text[i].pop_back();
 			}
 			else
 			{
@@ -122,8 +109,11 @@ void Editor::render()
 							 &line_pos.h);
 			line_pos.x = -scroll_chars.x * glyph_size.x;
 			line_pos.y = i * line_pos.h - scroll_chars.y * glyph_size.y;
+			// done rendering
 			SDL_RenderCopy(SDL::renderer, texture_part, NULL, &line_pos);
 			SDL_DestroyTexture(texture_part);
+			if(line_pos.y > size.y - border_size * 2)
+				break;
 		}
 		// assigning blank texture to classes texture and resetting renderer
 		SDL_SetRenderTarget(SDL::renderer, NULL);
@@ -139,15 +129,17 @@ void Editor::render()
 		SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &rect);
 	}
 
-	SDL_Rect cursor = { pos.x + glyph_size.x * (int)row -
-							scroll_chars.x * glyph_size.x + border_size,
-						pos.y + glyph_size.y * (int)col -
-							scroll_chars.y * glyph_size.y + border_size,
-						glyph_size.x, glyph_size.y };
+	SDL_Rect cursor = {
+		// raw pos                        scroll offset                   border offset
+		pos.x + glyph_size.x * (int)row - scroll_chars.x * glyph_size.x + border_size,
+		pos.y + glyph_size.y * (int)col - scroll_chars.y * glyph_size.y + border_size,
+		glyph_size.x, glyph_size.y
+	};
 
-	SDL_SetRenderDrawColor(SDL::renderer, (uint8_t)(255 - font_color.r),
-						   (uint8_t)(255 - font_color.g),
-						   (uint8_t)(255 - font_color.b), 100);
+	SDL_SetRenderDrawColor(SDL::renderer,
+						   (uint8_t)(0),
+						   (uint8_t)(0),
+						   (uint8_t)(0), 100);
 	SDL_SetRenderDrawBlendMode(SDL::renderer, SDL_BLENDMODE_BLEND);
 	if(active)
 	{
