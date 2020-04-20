@@ -66,11 +66,9 @@ void Editor::render()
 	// rendering outline
 	Instance::render();
 
-	handle_resize();
-	// rendering cursor
-
 	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
-	if((changed && text.size() > 0) || (col != prev_col && std::stoi(Settings::get_setting("highlight-line").value)))
+	if((changed && text.size() > 0) ||
+	   (col != prev_col && std::stoi(Settings::get_setting("highlight-line").value)))
 	{
 		this->num_cells = Ivec((size.x - border_size * 2) / glyph_size.x,
 							   (size.y - border_size * 2) / glyph_size.y);
@@ -103,18 +101,20 @@ void Editor::render()
 			}
 			else
 			{
-				texture_part = Resources::create_text(text[i], Resources::MONO,
+				texture_part = Resources::create_text(text[i],
+													  Resources::MONO,
 													  font_color);
 			}
 			SDL_Rect line_pos;
-			SDL_QueryTexture(texture_part, nullptr, nullptr, &line_pos.w,
-							 &line_pos.h);
+			SDL_QueryTexture(texture_part, nullptr, nullptr, &line_pos.w, &line_pos.h);
 			line_pos.x = -scroll_chars.x * glyph_size.x;
 			line_pos.y = i * line_pos.h - scroll_chars.y * glyph_size.y;
 			// done rendering
 			SDL_RenderCopy(SDL::renderer, texture_part, NULL, &line_pos);
 			SDL_DestroyTexture(texture_part);
-			if(line_pos.y > size.y - border_size * 2)
+
+			// break if it's past viewable y
+			if(line_pos.y > size.y - border_size * 2 && text[i].size() > 0)
 				break;
 		}
 		// assigning blank texture to classes texture and resetting renderer
@@ -472,6 +472,7 @@ void Editor::process_event(const SDL_Event& event)
 				{
 					FileSelector* fs = new FileSelector(Ivec(0,0), Ivec(0,0), 5);
 					switch_instance(this, fs);
+					return;
 				}
 				break;
 			}
