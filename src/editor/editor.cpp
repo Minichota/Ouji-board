@@ -5,6 +5,13 @@
 #include "file-selector.hpp"
 #include "instance-control.hpp"
 
+const std::vector<std::string> Editor::groupings =
+{
+	"\"!@#$%^&*',;",
+	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+	"(){}[]<> ",
+};
+
 Editor::Editor(Ivec pos, Ivec size, short border_size, std::string file,
 			   SDL_Color border_color, SDL_Color font_color) :
 Instance(pos, size, border_size, border_color),
@@ -23,7 +30,6 @@ animation(Ivec(pos.x + border_size, pos.y + border_size), 1000,
 	this->scroll_chars = { 0, 0 };
 	this->curr_file = file;
 
-	// TODO change file location
 	read(curr_file);
 }
 
@@ -391,27 +397,55 @@ void Editor::process_event(const SDL_Event& event)
 						{
 							if(keys[SDL_SCANCODE_LCTRL])
 							{
-								bool next_word_flag = false;
-								for(char* c = &text[col][row];
-									*c == ' ' || !next_word_flag;
-									c = &text[col][row])
+								size_t char_group;
+								for(size_t i = 0; i < 3; i++)
 								{
-									if(row == text[col].size())
+									if(std::find(groupings[i].begin(), groupings[i].end(),
+												 text[col][row]) != groupings[i].end())
 									{
-										if(col + 1 < text.size())
+										char_group = i;
+									}
+								}
+								bool cont = true;
+								while(cont)
+								{
+									if(row > text[col].size())
+									{
+										row = text[col].size();
+										if(col != text.size() - 1)
 										{
-											this->col++;
-											this->row = 0;
+											row = 0;
+											col++;
 										}
 										break;
 									}
-									else
+									row++;
+									for(size_t i = 0; i < 3; i++)
 									{
-										if(*c == ' ')
+										if(std::find(groupings[i].begin(), groupings[i].end(),
+													 text[col][row]) != groupings[i].end())
 										{
-											next_word_flag = true;
+											if(i != char_group)
+											{
+												cont = false;
+												break;
+											}
 										}
+									}
+									while(text[col][row] == ' ')
+									{
 										row++;
+										cont = false;
+										if(row > text[col].size())
+										{
+											row = text[col].size();
+											if(col != text.size() - 1)
+											{
+												row = 0;
+												col++;
+											}
+											break;
+										}
 									}
 								}
 							}

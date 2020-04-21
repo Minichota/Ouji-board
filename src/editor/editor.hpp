@@ -26,6 +26,7 @@ class Editor : public Instance
 	bool changed;
 
 	private:
+	const static std::vector<std::string> groupings;
 	std::string curr_file;
 	std::vector<std::string> text;
 	size_t col, row;
