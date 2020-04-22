@@ -5,11 +5,13 @@
 #include "file-selector.hpp"
 #include "instance-control.hpp"
 
+#define GROUPING_COUNT 5
 const std::vector<std::string> Editor::groupings =
 {
 	"\"!@#$%^&*',;",
 	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-	"(){}[]<> ",
+	"(){}[]<>",
+	" "
 };
 
 Editor::Editor(Ivec pos, Ivec size, short border_size, std::string file,
@@ -229,10 +231,24 @@ void Editor::process_event(const SDL_Event& event)
 								std::string copy_to_end = text[col].substr(row);
 								this->text[col].erase(text[col].begin() + row,
 													  text[col].end());
+
+								// count the previous offset
+								uint8_t indent_offset = 0;
+								char* stepper = text[col].data();
+								while(*stepper != '\0' && *stepper == ' ')
+								{
+									indent_offset++;
+									stepper++;
+								}
 								this->col++;
-								this->row = 0;
-								this->changed = true;
+								// apply
 								this->text.emplace(text.begin() + col);
+								for(int i = 0; i < indent_offset; i++)
+								{
+									this->text[col].push_back(' ');
+								}
+								this->row = indent_offset;
+								this->changed = true;
 								this->text[col].append(copy_to_end);
 							}
 						}
@@ -368,7 +384,7 @@ void Editor::process_event(const SDL_Event& event)
 							if(keys[SDL_SCANCODE_LCTRL])
 							{
 								int char_group = -1;
-								for(size_t i = 0; i < 3; i++)
+								for(size_t i = 0; i < GROUPING_COUNT; i++)
 								{
 									if(std::find(groupings[i].begin(), groupings[i].end(),
 												 text[col][row]) != groupings[i].end())
@@ -386,7 +402,7 @@ void Editor::process_event(const SDL_Event& event)
 										break;
 									}
 									row--;
-									for(size_t i = 0; i < 3; i++)
+									for(size_t i = 0; i < GROUPING_COUNT; i++)
 									{
 
 										if(std::find(groupings[i].begin(), groupings[i].end(),
@@ -420,7 +436,7 @@ void Editor::process_event(const SDL_Event& event)
 							if(keys[SDL_SCANCODE_LCTRL])
 							{
 								int char_group = -1;
-								for(size_t i = 0; i < 3; i++)
+								for(size_t i = 0; i < GROUPING_COUNT; i++)
 								{
 									if(std::find(groupings[i].begin(), groupings[i].end(),
 												 text[col][row]) != groupings[i].end())
@@ -442,7 +458,7 @@ void Editor::process_event(const SDL_Event& event)
 										break;
 									}
 									row++;
-									for(size_t i = 0; i < 3; i++)
+									for(size_t i = 0; i < GROUPING_COUNT; i++)
 									{
 										if(std::find(groupings[i].begin(), groupings[i].end(),
 													 text[col][row]) != groupings[i].end())
