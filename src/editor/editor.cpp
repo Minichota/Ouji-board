@@ -365,29 +365,51 @@ void Editor::process_event(const SDL_Event& event)
 						break;
 						case SDLK_b:
 						{
-							bool next_word_flag = false;
 							if(keys[SDL_SCANCODE_LCTRL])
 							{
-								for(char* c = &text[col][row];
-									*c == ' ' || !next_word_flag;
-									c = &text[col][row])
+								int char_group = -1;
+								for(size_t i = 0; i < 3; i++)
+								{
+									if(std::find(groupings[i].begin(), groupings[i].end(),
+												 text[col][row]) != groupings[i].end())
+									{
+										char_group = i;
+									}
+								}
+								bool cont = true;
+								while(cont)
 								{
 									if(row == 0)
 									{
-										if(col > 0)
-										{
-											this->col--;
-											this->row = text[col].size();
-										}
+										if(col != 0)
+											row = text[--col].size();
 										break;
 									}
-									else
+									row--;
+									for(size_t i = 0; i < 3; i++)
 									{
-										if(*c == ' ')
+
+										if(std::find(groupings[i].begin(), groupings[i].end(),
+													 text[col][row]) != groupings[i].end())
 										{
-											next_word_flag = true;
+											if((int)i != char_group)
+											{
+												cont = false;
+												break;
+											}
 										}
-										this->row--;
+									}
+									while(text[col][row] == ' ')
+									{
+										row--;
+										cont = false;
+										if(row <= 0)
+										{
+											row = 0;
+											if(col != 0)
+												row = text[--col].size();
+											break;
+										}
 									}
 								}
 							}
@@ -397,7 +419,7 @@ void Editor::process_event(const SDL_Event& event)
 						{
 							if(keys[SDL_SCANCODE_LCTRL])
 							{
-								size_t char_group;
+								int char_group = -1;
 								for(size_t i = 0; i < 3; i++)
 								{
 									if(std::find(groupings[i].begin(), groupings[i].end(),
@@ -425,7 +447,7 @@ void Editor::process_event(const SDL_Event& event)
 										if(std::find(groupings[i].begin(), groupings[i].end(),
 													 text[col][row]) != groupings[i].end())
 										{
-											if(i != char_group)
+											if((int)i != char_group)
 											{
 												cont = false;
 												break;
