@@ -26,7 +26,6 @@ class Terminal : public Instance
 	Ivec cursor_pos;
 	Ivec glyph_size;
 
-	TTF_Font* font;
 	SDL_Color font_color;
 	bool changed;
 

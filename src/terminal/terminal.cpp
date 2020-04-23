@@ -7,7 +7,6 @@ Terminal::Terminal(Ivec pos, Ivec size, short border_size,
 				   SDL_Color border_color, SDL_Color font_color) :
 Instance(pos, size, border_size, border_color)
 {
-	this->font = Resources::get_font(Resources::MONO);
 	this->font_color = font_color;
 	this->changed = true;
 	SDL_StartTextInput();
@@ -63,7 +62,7 @@ void Terminal::render()
 		{
 			SDL_DestroyTexture(render_texture);
 		}
-		TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
+		TTF_SizeText(Resources::get_font(Resources::MONO), " ", &glyph_size.x, &glyph_size.y);
 		SDL_Texture* render_complete = SDL_CreateTexture(
 			SDL::renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
 			(size.x - border_size * 2), (size.y - border_size * 2));

@@ -53,8 +53,8 @@ static bool process_events()
 int main()
 {
 	load_sdl();
-	load_res();
 	Settings::update_settings();
+	load_res(std::stoi(Settings::get_setting("font-size").value));
 	Settings::Setting& highlight_setting = Settings::get_setting("highlight-line");
 	highlight_setting.callback = [&](std::string args) -> void
 	{
@@ -66,6 +66,11 @@ int main()
 				editor->changed = true;
 			}
 		}
+	};
+	Settings::Setting& font_size_setting = Settings::get_setting("font-size");
+	font_size_setting.callback = [&](std::string args) -> void
+	{
+		load_res(std::stoi(args));
 	};
 	Ivec instance_size = { window_size.x, window_size.y };
 	FileSelector* fs =

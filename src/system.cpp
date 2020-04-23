@@ -110,11 +110,17 @@ SDL_Texture* create_shaded_text(std::string text, font_type font,
 	return texture;
 }
 
-void load_res()
+void load_res(int font_size)
 {
+	// clear out old fonts
+	for(TTF_Font* font : fonts)
+	{
+		TTF_CloseFont(font);
+	}
+	fonts.clear();
 	for(std::string font_path : font_paths)
 	{
-		TTF_Font* font = TTF_OpenFont(font_path.c_str(), 18);
+		TTF_Font* font = TTF_OpenFont(font_path.c_str(), font_size);
 		if(!font)
 		{
 			printf("[TTF] Failed to load font: %s", font_path.c_str());

@@ -164,6 +164,7 @@ void SettingEditor::process_event(const SDL_Event& event)
 							}
 							Settings::update_settings();
 							animation.activate();
+							this->changed = true;
 						}
 						break;
 					}

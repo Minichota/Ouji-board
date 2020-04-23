@@ -39,7 +39,7 @@ extern std::vector<std::string> font_paths;
 extern std::vector<SDL_Texture*> text_cache;
 size_t cache_text(SDL_Texture* text);
 SDL_Texture* load_cache_text(size_t pos);
-void load_res();
+void load_res(int font_size);
 void clear_res();
 enum font_type
 {
@@ -65,6 +65,7 @@ struct Setting
 static std::string settings_path = "res/settings/settings.ou";
 static std::map<std::string, Setting> setting_values = { { "volume", {"0"} },
 															 { "compile", {"make all"} },
+															 { "font-size", {"15"} },
 															 { "highlight-line", {"0"} } };
 Setting& get_setting(std::string setting_name);
 std::vector<std::pair<std::string, Setting>> get_all_settings();

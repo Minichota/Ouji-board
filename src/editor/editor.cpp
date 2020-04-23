@@ -22,7 +22,6 @@ animation(Ivec(pos.x + border_size, pos.y + border_size), 1000,
 								 SDL_Color{ 255, 255, 255, 255 }),
 		  SINGULAR)
 {
-	this->font = Resources::get_font(Resources::MONO);
 	this->font_color = font_color;
 	this->changed = true;
 	this->row = 0;
@@ -74,10 +73,11 @@ void Editor::render()
 	// rendering outline
 	Instance::render();
 
-	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
 	if((changed && text.size() > 0) ||
 	   (col != prev_col && std::stoi(Settings::get_setting("highlight-line").value)))
 	{
+		TTF_SizeText(Resources::get_font(Resources::MONO), " ", &glyph_size.x, &glyph_size.y);
+		std::cout << glyph_size << std::endl;
 		this->num_cells = Ivec((size.x - border_size * 2) / glyph_size.x,
 							   (size.y - border_size * 2) / glyph_size.y);
 		if(render_texture != nullptr)

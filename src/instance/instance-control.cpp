@@ -217,6 +217,7 @@ void push_instance(Instance* instance)
 		instances[current_instance]->active = false;
 		instance->set_size(last_size);
 		instance->set_pos(Ivec(last_pos.x + last_size.x, last_pos.y));
+		instances.back()->handle_resize();
 	}
 	else
 	{
