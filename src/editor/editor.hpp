@@ -23,8 +23,6 @@ class Editor : public Instance
 	void read(std::string path);
 	void save(std::string path);
 
-	bool changed;
-
 	private:
 	const static std::vector<std::string> groupings;
 	std::string curr_file;

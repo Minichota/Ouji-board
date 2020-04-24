@@ -46,6 +46,7 @@ class Instance
 	}
 
 	bool active;
+	bool changed;
 
 	static State state;
 

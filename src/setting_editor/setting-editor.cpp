@@ -9,7 +9,6 @@ animation(Ivec(pos.x + border_size, pos.y + border_size), 1000,
 		  						 SINGULAR)
 {
 	this->data = Settings::get_all_settings();
-	this->changed = true;
 	this->selected_setting = 0;
 	SDL_StartTextInput();
 }
@@ -164,7 +163,10 @@ void SettingEditor::process_event(const SDL_Event& event)
 							}
 							Settings::update_settings();
 							animation.activate();
-							this->changed = true;
+							for(Instance* instance : instances)
+							{
+								instance->changed = true;
+							}
 						}
 						break;
 					}

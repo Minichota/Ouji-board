@@ -23,7 +23,6 @@ animation(Ivec(pos.x + border_size, pos.y + border_size), 1000,
 		  SINGULAR)
 {
 	this->font_color = font_color;
-	this->changed = true;
 	this->row = 0;
 	this->col = 0;
 	this->prev_col = 0;

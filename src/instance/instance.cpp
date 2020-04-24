@@ -13,6 +13,7 @@ Instance::Instance(Ivec pos, Ivec size, short border_size,
 	this->border_size = border_size;
 	this->border_color = border_color;
 	this->active = false;
+	this->changed = true;
 	this->render_texture = nullptr;
 	this->thread = std::thread(&Instance::thread_update, this);
 }

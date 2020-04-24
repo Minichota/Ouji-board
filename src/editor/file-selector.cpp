@@ -16,7 +16,6 @@ Instance(pos, size, border_size, border_color)
 	this->font = Resources::get_font(Resources::MONO);
 	this->sel_file = 0;
 	SDL_StartTextInput();
-	this->changed = true;
 	this->num_files = scandir(current_path.c_str(), &dirents, 0, versionsort);
 	this->dirents[num_files] = nullptr;
 	this->scroll_pos = 0;

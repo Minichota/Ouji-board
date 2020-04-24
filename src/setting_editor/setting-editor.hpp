@@ -28,8 +28,6 @@ class SettingEditor : public Instance
 	std::vector<std::pair<std::string, Settings::Setting>> data;
 
 	size_t selected_setting;
-
-	bool changed;
 };
 
 #endif

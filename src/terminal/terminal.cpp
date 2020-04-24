@@ -8,7 +8,6 @@ Terminal::Terminal(Ivec pos, Ivec size, short border_size,
 Instance(pos, size, border_size, border_color)
 {
 	this->font_color = font_color;
-	this->changed = true;
 	SDL_StartTextInput();
 	this->text.emplace_back();
 	this->tty = create_tty();

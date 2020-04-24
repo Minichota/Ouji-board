@@ -27,7 +27,6 @@ class Terminal : public Instance
 	Ivec glyph_size;
 
 	SDL_Color font_color;
-	bool changed;
 
 	tty_instance* tty;
 };

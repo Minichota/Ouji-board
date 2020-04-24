@@ -23,6 +23,4 @@ class FileSelector : public Instance
 	int sel_file;
 	int num_files;
 	int scroll_pos;
-
-	bool changed;
 };
