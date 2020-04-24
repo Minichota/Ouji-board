@@ -5,7 +5,7 @@
 #include "file-selector.hpp"
 #include "instance-control.hpp"
 
-#define GROUPING_COUNT 5
+#define GROUPING_COUNT 4
 const std::vector<std::string> Editor::groupings =
 {
 	"\"!@#$%^&*',;",
@@ -77,7 +77,6 @@ void Editor::render()
 	   (col != prev_col && std::stoi(Settings::get_setting("highlight-line").value)))
 	{
 		TTF_SizeText(Resources::get_font(Resources::MONO), " ", &glyph_size.x, &glyph_size.y);
-		std::cout << glyph_size << std::endl;
 		this->num_cells = Ivec((size.x - border_size * 2) / glyph_size.x,
 							   (size.y - border_size * 2) / glyph_size.y);
 		if(render_texture != nullptr)
@@ -447,7 +446,7 @@ void Editor::process_event(const SDL_Event& event)
 								bool cont = true;
 								while(cont)
 								{
-									if(row > text[col].size())
+									if(row >= text[col].size())
 									{
 										row = text[col].size();
 										if(col != text.size() - 1)
