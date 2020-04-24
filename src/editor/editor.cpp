@@ -5,7 +5,7 @@
 #include "file-selector.hpp"
 #include "instance-control.hpp"
 
-#define GROUPING_COUNT 5
+#define GROUPING_COUNT 4
 const std::vector<std::string> Editor::groupings =
 {
 	"\"!@#$%^&*',;",
