@@ -26,9 +26,6 @@ std::string read_command(tty_instance* tty)
 
 void tty_loop(tty_instance* tty)
 {
-	memset(tty->command, 0, 1024);
-	memset(tty->out, 0, 1024);
-
 	int pipe_to_sh[2];
 	int pipe_to_te[2];
 	int pipe_to_te_error[2];
@@ -79,6 +76,12 @@ void tty_loop(tty_instance* tty)
 				{
 					read(pipe_to_te[0], &c, 1);
 					int len = strlen(tty->out);
+					if(len >= 1024)
+					{
+						tty->out[1024] = '\0';
+						strcpy(tty->out, &tty->out[512]);
+						tty->out[512] = '\0';
+					}
 					tty->out[len] = c;
 					tty->out[len + 1] = '\0';
 				}
@@ -89,8 +92,8 @@ void tty_loop(tty_instance* tty)
 					read(pipe_to_te_error[0], &c, 1);
 					tty->error_out.push_back(c);
 				}
-			} while(FD_ISSET(pipe_to_te[0], &rfd) ||
-					FD_ISSET(pipe_to_te_error[0], &rfd));
+			} while((FD_ISSET(pipe_to_te[0], &rfd) ||
+					FD_ISSET(pipe_to_te_error[0], &rfd)) && tty->active);
 			// appending error_out
 			size_t len = strlen(tty->out);
 			for(size_t i = 0; i < tty->error_out.size(); i++)
@@ -128,6 +131,13 @@ tty_instance* create_tty()
 
 void stop_tty(tty_instance* tty)
 {
+	*tty->out = 0;
 	tty->active = false;
 	tty->thread.join();
+}
+
+void start_tty(tty_instance* tty)
+{
+	tty->active = true;
+	tty->thread = std::thread(&tty_loop, tty);
 }

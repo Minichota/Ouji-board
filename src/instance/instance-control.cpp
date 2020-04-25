@@ -87,17 +87,21 @@ void handle_events(const SDL_Event& event)
 				{
 					if(Instance::state == COMMAND)
 					{
+						// make sure task is stopped
+						if(tty->active)
+							stop_tty(tty);
+						start_tty(tty);
+
 						set_command(tty, Settings::get_setting("compile").value);
-						if(!compile_address)
+						int previous = current_instance;
+						if(!compile_open)
 						{
 							compile_address = new TextBuffer(
 								Ivec(0, 0), SDL::window_size, 5, tty->out,
 								SDL_Color{ 255, 255, 255, 255 },
 								SDL_Color{ 255, 0, 255, 255 });
-						}
-						int previous = current_instance;
-						if(!compile_open)
 							push_instance(compile_address);
+						}
 						// assures that compile isn't selected after cmd+c
 						current_instance = find_instance(instances[previous]);
 						instances[previous]->handle_resize();
@@ -248,6 +252,10 @@ void remove_instance(size_t index)
 	}
 	else
 	{
+		if(tty->active)
+		{
+			stop_tty(tty);
+		}
 		compile_open = false;
 	}
 	instances.erase(instances.begin() + index);
