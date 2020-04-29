@@ -14,7 +14,7 @@
 
 void set_command(tty_instance* tty, std::string comm)
 {
-	memcpy(tty->command, comm.c_str(), 1024);
+	strcpy(tty->command, comm.c_str());
 }
 
 std::string read_command(tty_instance* tty)
@@ -56,21 +56,20 @@ void tty_loop(tty_instance* tty)
 			// parent
 			char c;
 			fd_set rfd;
-			fd_set wfd;
-			fd_set efd;
 			timeval tv;
 
 			// exit
 			do
 			{
 				FD_ZERO(&rfd);
-				FD_ZERO(&wfd);
-				FD_ZERO(&efd);
 				FD_SET(pipe_to_te[0], &rfd);
 				FD_SET(pipe_to_te_error[0], &rfd);
 				tv.tv_sec = 0;
 				tv.tv_usec = 100000;
-				select(100, &rfd, &wfd, &efd, &tv);
+				if(select(1000000, &rfd, NULL, NULL, &tv) == -1)
+				{
+					std::cout << "fail" << std::endl;
+				}
 
 				if(FD_ISSET(pipe_to_te[0], &rfd))
 				{
@@ -93,7 +92,7 @@ void tty_loop(tty_instance* tty)
 					tty->error_out.push_back(c);
 				}
 			} while((FD_ISSET(pipe_to_te[0], &rfd) ||
-					FD_ISSET(pipe_to_te_error[0], &rfd)) && tty->active);
+					 FD_ISSET(pipe_to_te_error[0], &rfd)) && tty->active);
 			// appending error_out
 			size_t len = strlen(tty->out);
 			for(size_t i = 0; i < tty->error_out.size(); i++)
@@ -125,15 +124,17 @@ tty_instance* create_tty()
 {
 	tty_instance* tty = new tty_instance;
 	*tty->out = 0;
+	*tty->command = 0;
 	tty->thread = std::thread(&tty_loop, tty);
 	return tty;
 }
 
 void stop_tty(tty_instance* tty)
 {
-	*tty->out = 0;
 	tty->active = false;
 	tty->thread.join();
+	*tty->out = 0;
+	*tty->command = 0;
 }
 
 void start_tty(tty_instance* tty)

@@ -50,6 +50,7 @@ static bool process_events()
 	}
 	return true;
 }
+
 int main()
 {
 	load_sdl();

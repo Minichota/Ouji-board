@@ -22,8 +22,10 @@ class Terminal : public Instance
 	void handle_resize();
 
 	private:
+	std::string input_text;
 	std::vector<std::string> text;
 	Ivec cursor_pos;
+	int scroll_pos;
 	Ivec glyph_size;
 
 	SDL_Color font_color;

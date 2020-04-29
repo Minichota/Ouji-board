@@ -9,8 +9,8 @@ Instance(pos, size, border_size, border_color)
 {
 	this->font_color = font_color;
 	SDL_StartTextInput();
-	this->text.emplace_back();
 	this->tty = create_tty();
+	this->scroll_pos = 0;
 }
 
 Terminal::~Terminal()
@@ -41,11 +41,19 @@ void Terminal::update()
 			if(s == clear_seq)
 			{
 				// flush terminal
+				for(std::string s : text)
+				{
+					s.clear();
+				}
 				this->text.clear();
-				this->text.emplace_back();
+				scroll_pos = 0;
 			}
 		}
 		this->changed = true;
+	}
+	while((int)text.size() * glyph_size.y - scroll_pos * glyph_size.y >= size.y - glyph_size.y)
+	{
+		scroll_pos++;
 	}
 }
 
@@ -57,7 +65,7 @@ void Terminal::render()
 	if(changed)
 	{
 		// creates a large texture from all the lines of text
-		if(this->render_texture != nullptr)
+		if(render_texture != nullptr)
 		{
 			SDL_DestroyTexture(render_texture);
 		}
@@ -66,18 +74,29 @@ void Terminal::render()
 			SDL::renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
 			(size.x - border_size * 2), (size.y - border_size * 2));
 		SDL_SetRenderTarget(SDL::renderer, render_complete);
-		for(size_t i = 0; i < text.size(); i++)
+
+		const SDL_Rect input_rect =
 		{
-			SDL_Texture* texture =
-				Resources::create_text(text[i], Resources::MONO, font_color);
+			0,
+			0,
+			glyph_size.x * (int)input_text.size(),
+			glyph_size.y
+		};
+		SDL_Texture* texture = Resources::create_text(input_text, Resources::MONO, font_color);
+		SDL_RenderCopy(SDL::renderer, texture, nullptr, &input_rect);
+		SDL_DestroyTexture(texture);
 
-			SDL_Rect dest_rect = { 0, (int)i * glyph_size.y };
-			SDL_QueryTexture(texture, nullptr, nullptr, &dest_rect.w,
-							 &dest_rect.h);
+		for(size_t i = scroll_pos; i < text.size(); i++)
+		{
+			SDL_Texture* texture = Resources::create_text(text[i], Resources::MONO, font_color);
 
+			SDL_Rect dest_rect = { 0, (int)(i+1) * glyph_size.y - scroll_pos * glyph_size.y };
+			SDL_QueryTexture(texture, nullptr, nullptr, &dest_rect.w, &dest_rect.h);
 			SDL_RenderCopy(SDL::renderer, texture, nullptr, &dest_rect);
-
 			SDL_DestroyTexture(texture);
+
+			if(dest_rect.y > size.y - border_size * 2 && text[i].size() > 0)
+				break;
 		}
 		this->render_texture = render_complete;
 		SDL_SetRenderTarget(SDL::renderer, nullptr);
@@ -92,7 +111,7 @@ void Terminal::render()
 		SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &dest_rect);
 	}
 	// rendering cursor
-	SDL_Rect cursor{ pos.x + border_size + glyph_size.x * (int)text[0].size(),
+	SDL_Rect cursor{ pos.x + border_size + glyph_size.x * (int)input_text.size(),
 					 pos.y + border_size, glyph_size.x, glyph_size.y };
 	SDL_SetRenderDrawColor(SDL::renderer, 255, 255, 255, 100);
 	SDL_SetRenderDrawBlendMode(SDL::renderer, SDL_BLENDMODE_BLEND);
@@ -116,7 +135,7 @@ void Terminal::process_event(const SDL_Event& event)
 			{
 				case SDL_TEXTINPUT:
 				{
-					this->text[0].append(event.text.text);
+					this->input_text.append(event.text.text);
 					this->changed = true;
 				}
 				break;
@@ -127,18 +146,18 @@ void Terminal::process_event(const SDL_Event& event)
 					{
 						case SDLK_RETURN:
 						{
-							set_command(tty, text[0]);
-							this->text.push_back(text[0]);
-							this->text[0].clear();
+							set_command(tty, input_text);
+							this->text.push_back(input_text);
+							this->input_text.clear();
 							this->changed = true;
 						}
 						break;
 						case SDLK_BACKSPACE:
 						{
-							if(text[0].size() > 0)
+							if(input_text.size() > 0)
 							{
 								this->changed = true;
-								this->text[0].pop_back();
+								this->input_text.pop_back();
 							}
 						}
 						break;
@@ -147,8 +166,11 @@ void Terminal::process_event(const SDL_Event& event)
 							const uint8_t* keys = SDL_GetKeyboardState(NULL);
 							if(keys[SDL_SCANCODE_LCTRL])
 							{
-								this->text[0].clear();
+								this->input_text.clear();
 								this->changed = true;
+								// restart tty to make sure command is ended
+								stop_tty(tty);
+								start_tty(tty);
 							}
 						}
 						break;
@@ -171,10 +193,8 @@ void Terminal::handle_resize()
 	if(render_texture != nullptr)
 	{
 		Ivec texture_size;
-		SDL_QueryTexture(render_texture, nullptr, nullptr, &texture_size.x,
-						 &texture_size.y);
-		if(Ivec(size.x - border_size * 2, size.y - border_size * 2) !=
-		   texture_size)
+		SDL_QueryTexture(render_texture, nullptr, nullptr, &texture_size.x, &texture_size.y);
+		if(Ivec(size.x - border_size * 2, size.y - border_size * 2) != texture_size)
 		{
 			this->changed = true;
 		}
