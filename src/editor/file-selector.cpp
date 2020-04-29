@@ -25,12 +25,12 @@ Instance(pos, size, border_size, border_color)
 
 void FileSelector::update()
 {
-	static Ivec glyph_size;
+	Ivec glyph_size;
+	if(!font)
+		return;
+	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
 	if(!glyph_size)
-	{
-		// only call once
-		TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
-	}
+		return;
 	while(sel_file - scroll_pos >= size.y / glyph_size.y)
 	{
 		this->scroll_pos++;
@@ -45,7 +45,7 @@ void FileSelector::update()
 
 void FileSelector::render()
 {
-	static Ivec glyph_size;
+	Ivec glyph_size;
 	TTF_SizeText(font, " ", &glyph_size.x, &glyph_size.y);
 	Instance::render();
 	if(changed)
