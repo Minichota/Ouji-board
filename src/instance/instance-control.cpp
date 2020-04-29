@@ -177,7 +177,10 @@ void close_all_instances()
 		delete instance;
 	}
 	instances.clear();
-	stop_tty(tty);
+	if(tty->active)
+	{
+		stop_tty(tty);
+	}
 }
 
 int find_instance(Instance* instance)
@@ -235,7 +238,7 @@ void push_instance(Instance* instance)
 
 void remove_instance(size_t index)
 {
-	if(instances.size() == 0)
+	if(instances.empty())
 	{
 		SDL_Quit();
 		TTF_Quit();
@@ -259,7 +262,7 @@ void remove_instance(size_t index)
 		compile_open = false;
 	}
 	instances.erase(instances.begin() + index);
-	if(instances.size() == 0)
+	if(instances.empty())
 		return;
 
 	// size adjust
