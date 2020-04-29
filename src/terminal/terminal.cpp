@@ -38,7 +38,7 @@ void Terminal::update()
 			static std::string clear_seq =
 				std::string() + ESC + "[H" + ESC + "[2J";
 
-			if(s == clear_seq)
+			if(s == clear_seq || s == "\033c")
 			{
 				// flush terminal
 				for(std::string s : text)
