@@ -2,6 +2,7 @@
 
 #include "instance.hpp"
 #include "system.hpp"
+#include "traces.hpp"
 
 State Instance::state = NORMAL;
 Instance::Instance(Ivec pos, Ivec size, short border_size,

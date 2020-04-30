@@ -10,6 +10,7 @@
 #include "terminal.hpp"
 #include "tty.hpp"
 #include "vectors.hpp"
+#include "traces.hpp"
 
 using namespace SDL;
 using namespace Resources;
@@ -87,6 +88,9 @@ int main()
 	size_t command_cache = Resources::cache_text(Resources::create_text(
 		"COMMAND MODE", Resources::MONO, SDL_Color{ 255, 255, 255, 255 }));
 
+	push_trace(&mouse_pos.x);
+	push_trace(&mouse_pos.y);
+
 	while(true)
 	{
 		if(!process_events())
@@ -100,6 +104,8 @@ int main()
 		{
 			instances[i]->render();
 		}
+
+		render_traces();
 
 		/* rendering of current_state to corner of screen */
 		SDL_Texture* texture = nullptr;
