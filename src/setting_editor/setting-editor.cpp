@@ -197,6 +197,11 @@ void SettingEditor::process_event(const SDL_Event& event)
 			SDL_StopTextInput();
 		}
 		break;
+		case DEBUG:
+		{
+			SDL_StopTextInput();
+		}
+		break;
 	}
 }
 

@@ -61,6 +61,10 @@ void TextBuffer::process_event(const SDL_Event& event)
 		{
 		}
 		break;
+		case DEBUG:
+		{
+		}
+		break;
 	}
 }
 

@@ -10,6 +10,7 @@
 template <class T>
 struct Trace
 {
+	const char* name;
 	T* value;
 	T prev = -1;
 	SDL_Texture* texture = nullptr;
@@ -19,13 +20,14 @@ extern std::vector<std::variant<Trace<float>*, Trace<int>*>> traces;
 
 void render_traces();
 
+bool handle_trace_event(const SDL_Event& event);
+
 template <class T>
-void push_trace(T* trace)
+void push_trace(const char* name, T* trace)
 {
-	traces.push_back(new Trace<T>{trace});
+	traces.push_back(new Trace<T>{name, trace});
 }
 
-void remove_trace(Trace<float>* trace);
-void remove_trace(Trace<int>* trace);
+void remove_trace(const char* name);
 
 #endif

@@ -10,6 +10,7 @@ enum State
 {
 	NORMAL,
 	COMMAND,
+	DEBUG,
 };
 
 class Instance

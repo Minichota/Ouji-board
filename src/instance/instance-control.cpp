@@ -156,7 +156,11 @@ void handle_events(const SDL_Event& event)
 					const uint8_t* keys = SDL_GetKeyboardState(NULL);
 					if(keys[SDL_SCANCODE_LCTRL])
 					{
-						Instance::state = COMMAND;
+						// TODO: Not sure about this one
+						if(Instance::state != DEBUG)
+						{
+							Instance::state = COMMAND;
+						}
 					}
 				}
 				break;

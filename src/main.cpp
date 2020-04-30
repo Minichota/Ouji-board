@@ -46,8 +46,11 @@ static bool process_events()
 		}
 		handle_events(event);
 
-		if(!instances.empty())
-			instances[current_instance]->process_event(event);
+		if(!handle_trace_event(event))
+		{
+			if(!instances.empty())
+				instances[current_instance]->process_event(event);
+		}
 	}
 	return true;
 }
@@ -87,9 +90,11 @@ int main()
 		"NORMAL MODE", Resources::MONO, SDL_Color{ 255, 255, 255, 255 }));
 	size_t command_cache = Resources::cache_text(Resources::create_text(
 		"COMMAND MODE", Resources::MONO, SDL_Color{ 255, 255, 255, 255 }));
+	size_t debug_cache = Resources::cache_text(Resources::create_text(
+		"DEBUG MODE", Resources::MONO, SDL_Color{ 255, 255, 255, 255 }));
 
-	push_trace(&mouse_pos.x);
-	push_trace(&mouse_pos.y);
+	push_trace("mouse x", &mouse_pos.x);
+	push_trace("mouse y", &mouse_pos.y);
 
 	while(true)
 	{
@@ -119,6 +124,11 @@ int main()
 			case COMMAND:
 			{
 				texture = Resources::load_cache_text(command_cache);
+			}
+			break;
+			case DEBUG:
+			{
+				texture = Resources::load_cache_text(debug_cache);
 			}
 			break;
 		}
