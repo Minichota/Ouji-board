@@ -93,8 +93,10 @@ int main()
 	size_t debug_cache = Resources::cache_text(Resources::create_text(
 		"DEBUG MODE", Resources::MONO, SDL_Color{ 255, 255, 255, 255 }));
 
-	push_trace("mouse x", &mouse_pos.x);
-	push_trace("mouse y", &mouse_pos.y);
+	int pos = 0;
+	push_trace(false, "mouse x", &mouse_pos.x);
+	push_trace(false, "mouse y", &mouse_pos.y);
+	push_trace(true, "test", &pos);
 
 	while(true)
 	{

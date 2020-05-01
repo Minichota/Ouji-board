@@ -10,7 +10,8 @@
 template <class T>
 struct Trace
 {
-	const char* name;
+	bool editable;
+	std::string name;
 	T* value;
 	T prev = -1;
 	SDL_Texture* texture = nullptr;
@@ -23,9 +24,9 @@ void render_traces();
 bool handle_trace_event(const SDL_Event& event);
 
 template <class T>
-void push_trace(const char* name, T* trace)
+void push_trace(bool editable, std::string name, T* trace)
 {
-	traces.push_back(new Trace<T>{name, trace});
+	traces.push_back(new Trace<T>{editable, name, trace});
 }
 
 void remove_trace(const char* name);
