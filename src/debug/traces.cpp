@@ -4,28 +4,60 @@
 
 static Ivec trace_win_pos = {100,100};
 
+static std::string path = "";
+
 static int selected_trace = 0;
 static int prev_trace = 0;
 
 std::vector<std::variant<Trace<float>*, Trace<int>*>> traces = {};
+std::vector<std::variant<Trace<float>*, Trace<int>*>> rendered_traces = {};
+std::vector<std::string> rendered_strings = {};
 
 void render_traces()
 {
 	if(Instance::state == DEBUG)
 	{
+		rendered_strings.clear();
+		rendered_traces.clear();
+
+		// building rendered_traces
 		for(size_t i = 0; i < traces.size(); i++)
 		{
-			const SDL_Color draw_color = (int)i == selected_trace ?
+			std::visit([&](auto&& arg) {
+				std::vector<std::string> path_split = Util::split_string(path, '/');
+				std::vector<std::string> trace_split = Util::split_string(arg->path, '/');
+
+				for(size_t i = 0; i < path_split.size(); i++)
+				{
+					if(trace_split[i] != path_split[i])
+					{
+						return;
+					}
+				}
+				rendered_traces.push_back(arg);
+
+			}, traces[i]);
+		}
+		for(size_t i = 0; i < rendered_traces.size(); i++)
+		{
+			SDL_Color draw_color = (int)i == selected_trace ?
 			SDL_Color { 0,255,255,255 } :
 			SDL_Color { 0,0,  255,255 };
 
 			SDL_Texture* render_texture;
-			std::visit([&i,&render_texture,draw_color](auto&& arg) {
-				if(*arg->value != arg->prev || selected_trace != prev_trace)
+			std::string repr = "";
+			std::visit([&](auto&& arg) {
+				if(arg->texture != nullptr)
+					SDL_DestroyTexture(arg->texture);
+				std::vector<std::string> path_split  = Util::split_string(path, '/');
+				std::vector<std::string> trace_split = Util::split_string(arg->path, '/');
+				repr.append(trace_split[path_split.size()]);
+
+				// only add to this if it's not a directory //
+
+				if(trace_split.size() - 1 == path_split.size())
 				{
-					if(arg->texture != nullptr)
-						SDL_DestroyTexture(arg->texture);
-					std::string repr = std::string(arg->name)+": "+std::to_string(*arg->value);
+					repr.append(": "+std::to_string(*arg->value));
 					// remove extra precision from floats
 					using T = std::decay_t<decltype(arg)>;
 					if constexpr (std::is_same_v<T, Trace<float>*>)
@@ -35,14 +67,26 @@ void render_traces()
 							repr.pop_back();
 						}
 					}
-					arg->texture = Resources::create_text(repr, Resources::MONO, draw_color);
 				}
+				else
+				{
+					// change colors for directories
+					draw_color = (int)rendered_strings.size() == selected_trace ?
+					SDL_Color{ 255,255,255,255 } :
+					SDL_Color{ 127,127,127,255 };
+				}
+				arg->texture = Resources::create_text(repr, Resources::MONO, draw_color);
 				render_texture = arg->texture;
-				arg->prev = *arg->value;
-			}, traces[i]);
-			SDL_Rect rect = {trace_win_pos.x, trace_win_pos.y + (int)i * 20};
-			SDL_QueryTexture(render_texture, nullptr, nullptr, &rect.w, &rect.h);
-			SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &rect);
+			}, rendered_traces[i]);
+
+			if(std::find(rendered_strings.begin(), rendered_strings.end(), repr) == rendered_strings.end() ||
+			   std::find(repr.begin(), repr.end(), ':') != repr.end())
+			{
+				SDL_Rect rect = { trace_win_pos.x, trace_win_pos.y + (int)rendered_strings.size() * 20 };
+				SDL_QueryTexture(render_texture, nullptr, nullptr, &rect.w, &rect.h);
+				SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &rect);
+				rendered_strings.push_back(repr);
+			}
 		}
 	}
 }
@@ -81,11 +125,22 @@ bool handle_trace_event(const SDL_Event& event)
 				{
 					switch(event.key.keysym.sym)
 					{
+						case SDLK_RETURN:
+						{
+							std::string selected_string = rendered_strings[selected_trace];
+							if(std::find(selected_string.begin(),
+										 selected_string.end(), ':') == selected_string.end())
+							{
+								path.append("/" + rendered_strings[selected_trace]);
+								selected_trace = 0;
+							}
+						}
+						break;
 						case SDLK_j:
 						{
 							prev_trace = selected_trace;
 							selected_trace++;
-							if(selected_trace > (int)traces.size() - 1)
+							if(selected_trace > (int)rendered_strings.size() - 1)
 							{
 								selected_trace = 0;
 							}
@@ -97,13 +152,19 @@ bool handle_trace_event(const SDL_Event& event)
 							selected_trace--;
 							if(selected_trace < 0)
 							{
-								selected_trace = (int)traces.size() - 1;
+								selected_trace = (int)rendered_strings.size() - 1;
 							}
 						}
 						break;
 						case SDLK_d:
 						{
 							Instance::state = NORMAL;
+						}
+						break;
+						case SDLK_h:
+						{
+							path = path.substr(0, path.find_last_of("\\/"));
+							selected_trace = 0;
 						}
 						break;
 						case SDLK_0:
@@ -124,7 +185,7 @@ bool handle_trace_event(const SDL_Event& event)
 									value.push_back(event.key.keysym.sym);
 									*arg->value = std::stoi(value);
 								}
-							}, traces[selected_trace]);
+							}, rendered_traces[selected_trace]);
 						}
 						break;
 						case SDLK_BACKSPACE:
@@ -139,7 +200,7 @@ bool handle_trace_event(const SDL_Event& event)
 									else
 										*arg->value = 0;
 								}
-							}, traces[selected_trace]);
+							}, rendered_traces[selected_trace]);
 						}
 						break;
 					}
@@ -150,12 +211,12 @@ bool handle_trace_event(const SDL_Event& event)
 	return Instance::state == DEBUG;
 }
 
-void remove_trace(const char* name)
+void remove_trace(const char* path)
 {
 	for(size_t i = 0; i < traces.size(); i++)
 	{
-		std::visit([&i, name](auto&& arg) {
-			if(arg->name == name)
+		std::visit([&i, path](auto&& arg) {
+			if(arg->path == path)
 				traces.erase(traces.begin() + i);
 			SDL_DestroyTexture(arg->texture);
 		}, traces[i]);

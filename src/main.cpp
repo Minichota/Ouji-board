@@ -93,10 +93,8 @@ int main()
 	size_t debug_cache = Resources::cache_text(Resources::create_text(
 		"DEBUG MODE", Resources::MONO, SDL_Color{ 255, 255, 255, 255 }));
 
-	int pos = 0;
-	push_trace(false, "mouse x", &mouse_pos.x);
-	push_trace(false, "mouse y", &mouse_pos.y);
-	push_trace(true, "test", &pos);
+	push_trace(false, "/variadic/mouse x", &mouse_pos.x);
+	push_trace(false, "/variadic/mouse y", &mouse_pos.y);
 
 	while(true)
 	{
@@ -118,20 +116,11 @@ int main()
 		SDL_Texture* texture = nullptr;
 		switch(Instance::state)
 		{
-			case NORMAL:
-			{
-				texture = Resources::load_cache_text(normal_cache);
-			}
+			case NORMAL:  texture = Resources::load_cache_text(normal_cache);
 			break;
-			case COMMAND:
-			{
-				texture = Resources::load_cache_text(command_cache);
-			}
+			case COMMAND: texture = Resources::load_cache_text(command_cache);
 			break;
-			case DEBUG:
-			{
-				texture = Resources::load_cache_text(debug_cache);
-			}
+			case DEBUG:   texture = Resources::load_cache_text(debug_cache);
 			break;
 		}
 		SDL_Rect dest_rect;
