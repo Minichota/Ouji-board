@@ -211,14 +211,16 @@ bool handle_trace_event(const SDL_Event& event)
 	return Instance::state == DEBUG;
 }
 
-void remove_trace(const char* path)
+void remove_trace(void* address)
 {
 	for(size_t i = 0; i < traces.size(); i++)
 	{
-		std::visit([&i, path](auto&& arg) {
-			if(arg->path == path)
-				traces.erase(traces.begin() + i);
-			SDL_DestroyTexture(arg->texture);
+		std::visit([&i, address](auto&& arg) {
+			if(arg->address == address)
+			{
+				traces.erase(traces.begin() + i--);
+				SDL_DestroyTexture(arg->texture);
+			}
 		}, traces[i]);
 	}
 }

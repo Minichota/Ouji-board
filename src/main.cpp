@@ -93,8 +93,8 @@ int main()
 	size_t debug_cache = Resources::cache_text(Resources::create_text(
 		"DEBUG MODE", Resources::MONO, SDL_Color{ 255, 255, 255, 255 }));
 
-	push_trace(false, "/variadic/mouse x", &mouse_pos.x);
-	push_trace(false, "/variadic/mouse y", &mouse_pos.y);
+	push_trace(nullptr, false, "/variadic/mouse x", &mouse_pos.x);
+	push_trace(nullptr, false, "/variadic/mouse y", &mouse_pos.y);
 
 	while(true)
 	{
