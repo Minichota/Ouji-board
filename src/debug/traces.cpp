@@ -175,9 +175,14 @@ bool handle_trace_event(const SDL_Event& event)
 						{
 							// push the number
 							std::visit([event](auto&& arg) {
-								std::string value = std::to_string(*arg->value);
-								value.push_back(event.key.keysym.sym);
-								*arg->value = std::stoi(value);
+								int path_counts  = Util::split_string(path, '/').size();
+								int trace_counts = Util::split_string(arg->path, '/').size();
+								if(trace_counts - 1 == path_counts)
+								{
+									std::string value = std::to_string(*arg->value);
+									value.push_back(event.key.keysym.sym);
+									*arg->value = std::stoi(value);
+								}
 							}, rendered_traces[selected_trace]);
 						}
 						break;
