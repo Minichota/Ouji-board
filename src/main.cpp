@@ -109,6 +109,7 @@ int main()
 		}
 
 		render_traces();
+		render_temps();
 
 		/* rendering of current_state to corner of screen */
 		SDL_Texture* texture = nullptr;
@@ -133,7 +134,6 @@ int main()
 		push_temp("mouse y: " + std::to_string(mouse_pos.y));
 		/* render */
 		Animation::global_render();
-		render_temps();
 		SDL_RenderPresent(renderer);
 
 		Time::update_time();
