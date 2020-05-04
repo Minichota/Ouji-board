@@ -17,10 +17,10 @@ Instance::Instance(Ivec pos, Ivec size, short border_size,
 	this->changed = true;
 	this->render_texture = nullptr;
 	this->thread = std::thread(&Instance::thread_update, this);
-	push_trace(this, true, "/instances/positions/pos_x", &this->pos.x);
-	push_trace(this, true, "/instances/positions/pos_y", &this->pos.y);
-	push_trace(this, true, "/instances/sizes/size_x", &this->size.x);
-	push_trace(this, true, "/instances/sizes/size_y", &this->size.y);
+	push_trace(this, "/instances/positions/pos_x", &this->pos.x);
+	push_trace(this, "/instances/positions/pos_y", &this->pos.y);
+	push_trace(this, "/instances/sizes/size_x", &this->size.x);
+	push_trace(this, "/instances/sizes/size_y", &this->size.y);
 }
 
 Instance::~Instance()

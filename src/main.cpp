@@ -94,9 +94,6 @@ int main()
 	size_t debug_cache = Resources::cache_text(Resources::create_text(
 		"DEBUG MODE", Resources::MONO, SDL_Color{ 255, 255, 255, 255 }));
 
-	push_trace(nullptr, false, "/variadic/mouse x", &mouse_pos.x);
-	push_trace(nullptr, false, "/variadic/mouse y", &mouse_pos.y);
-
 	while(true)
 	{
 		if(!process_events())
@@ -132,6 +129,8 @@ int main()
 		SDL_RenderCopy(renderer, texture, nullptr, &dest_rect);
 
 		SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
+		push_temp("mouse x: " + std::to_string(mouse_pos.x));
+		push_temp("mouse y: " + std::to_string(mouse_pos.y));
 		/* render */
 		Animation::global_render();
 		render_temps();

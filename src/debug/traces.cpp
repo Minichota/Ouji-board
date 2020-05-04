@@ -40,9 +40,9 @@ void render_traces()
 		}
 		for(size_t i = 0; i < rendered_traces.size(); i++)
 		{
-			SDL_Color draw_color = (int)i == selected_trace ?
-			SDL_Color { 0,255,255,255 } :
-			SDL_Color { 0,0,  255,255 };
+			SDL_Color draw_color = (int)rendered_strings.size() == selected_trace ?
+			SDL_Color { 255,255,255,255 } :
+			SDL_Color { 255,255,255,100 };
 
 			SDL_Texture* render_texture;
 			std::string repr = "";
@@ -67,13 +67,6 @@ void render_traces()
 							repr.pop_back();
 						}
 					}
-				}
-				else
-				{
-					// change colors for directories
-					draw_color = (int)rendered_strings.size() == selected_trace ?
-					SDL_Color{ 255,255,255,255 } :
-					SDL_Color{ 127,127,127,255 };
 				}
 				arg->texture = Resources::create_text(repr, Resources::MONO, draw_color);
 				render_texture = arg->texture;
@@ -182,12 +175,9 @@ bool handle_trace_event(const SDL_Event& event)
 						{
 							// push the number
 							std::visit([event](auto&& arg) {
-								if(arg->editable)
-								{
-									std::string value = std::to_string(*arg->value);
-									value.push_back(event.key.keysym.sym);
-									*arg->value = std::stoi(value);
-								}
+								std::string value = std::to_string(*arg->value);
+								value.push_back(event.key.keysym.sym);
+								*arg->value = std::stoi(value);
 							}, rendered_traces[selected_trace]);
 						}
 						break;
@@ -195,15 +185,12 @@ bool handle_trace_event(const SDL_Event& event)
 						{
 							// pop back number
 							std::visit([event](auto&& arg) {
-								if(arg->editable)
-								{
-									std::string value = std::to_string(*arg->value);
-									value.pop_back();
-									if(!value.empty())
-										*arg->value = std::stoi(value);
-									else
-										*arg->value = 0;
-								}
+								std::string value = std::to_string(*arg->value);
+								value.pop_back();
+								if(!value.empty())
+									*arg->value = std::stoi(value);
+								else
+									*arg->value = 0;
 							}, rendered_traces[selected_trace]);
 						}
 						break;

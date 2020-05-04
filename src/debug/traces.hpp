@@ -11,7 +11,6 @@ template <class T>
 struct Trace
 {
 	void* address;
-	bool editable;
 	std::string path;
 	T* value;
 	SDL_Texture* texture = nullptr;
@@ -24,9 +23,9 @@ void render_traces();
 bool handle_trace_event(const SDL_Event& event);
 
 template <class T>
-void push_trace(void* address, bool editable, std::string path, T* trace)
+void push_trace(void* address, std::string path, T* trace)
 {
-	traces.push_back(new Trace<T>{address, editable, path, trace});
+	traces.push_back(new Trace<T>{address, path, trace});
 }
 
 void remove_trace(void* address);
