@@ -128,6 +128,7 @@ bool handle_trace_event(const SDL_Event& event)
 						case SDLK_RETURN:
 						{
 							std::string selected_string = rendered_strings[selected_trace];
+							// change path if it's a directory
 							if(std::find(selected_string.begin(),
 										 selected_string.end(), ':') == selected_string.end())
 							{
@@ -163,6 +164,7 @@ bool handle_trace_event(const SDL_Event& event)
 						break;
 						case SDLK_h:
 						{
+							// pop back directory
 							path = path.substr(0, path.find_last_of("\\/"));
 							selected_trace = 0;
 						}
@@ -178,6 +180,7 @@ bool handle_trace_event(const SDL_Event& event)
 						case SDLK_8:
 						case SDLK_9:
 						{
+							// push the number
 							std::visit([event](auto&& arg) {
 								if(arg->editable)
 								{
@@ -190,6 +193,7 @@ bool handle_trace_event(const SDL_Event& event)
 						break;
 						case SDLK_BACKSPACE:
 						{
+							// pop back number
 							std::visit([event](auto&& arg) {
 								if(arg->editable)
 								{
@@ -213,6 +217,9 @@ bool handle_trace_event(const SDL_Event& event)
 
 void remove_trace(void* address)
 {
+	// removes trace based off of address supplied.
+	// used after object is destructed and shouldn't
+	// be used on permanent lifetime variables
 	for(size_t i = 0; i < traces.size(); i++)
 	{
 		std::visit([&i, address](auto&& arg) {
