@@ -10,6 +10,7 @@
 #include "terminal.hpp"
 #include "tty.hpp"
 #include "vectors.hpp"
+#include "temp.hpp"
 #include "traces.hpp"
 
 using namespace SDL;
@@ -133,6 +134,7 @@ int main()
 		SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
 		/* render */
 		Animation::global_render();
+		render_temps();
 		SDL_RenderPresent(renderer);
 
 		Time::update_time();
