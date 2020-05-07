@@ -93,12 +93,25 @@ void Editor::render()
 		// rendering each layer to blank texture
 		for(size_t i = scroll_chars.y; i < text.size(); i++)
 		{
+			std::string render_text = text[i];
+			if(std::stoi(Settings::get_setting("space-dots").value))
+			{
+				bool quote_flag = false;
+				for(size_t j = 0; j < render_text.size(); j++)
+				{
+					if(render_text[j] == '"')
+						quote_flag = !quote_flag;
+					if(render_text[j] == ' ' && !quote_flag)
+						render_text[j] = (char)'·';
+				}
+			}
+
 			SDL_Texture* texture_part;
 			if(i == col && std::stoi(Settings::get_setting("highlight-line").value))
 			{
-				text[i].push_back(' ');
+				render_text.push_back(' ');
 				texture_part = Resources::create_shaded_text(
-					text[i], Resources::MONO,
+					render_text, Resources::MONO,
 					{ (uint8_t)(255 - font_color.r),
 					  (uint8_t)(255 - font_color.g),
 					  (uint8_t)(255 - font_color.b) },
@@ -107,7 +120,7 @@ void Editor::render()
 			}
 			else
 			{
-				texture_part = Resources::create_text(text[i],
+				texture_part = Resources::create_text(render_text,
 													  Resources::MONO,
 													  font_color);
 			}

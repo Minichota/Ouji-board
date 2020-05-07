@@ -66,6 +66,7 @@ static std::string settings_path = "res/settings/settings.ou";
 static std::map<std::string, Setting> setting_values = { { "volume", {"0"} },
 														 { "compile", {"make all"} },
 														 { "font-size", {"15"} },
+														 { "space-dots", {"0"} },
 														 { "highlight-line", {"0"} } };
 Setting& get_setting(std::string setting_name);
 std::vector<std::pair<std::string, Setting>> get_all_settings();

@@ -1,4 +1,5 @@
 compile=g++ res/test/test.cpp && echo "Compile completed with exit code: $?" && ./a.out
 font-size=15
 highlight-line=0
+space-dots=1
 volume=0
