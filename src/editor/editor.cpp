@@ -514,13 +514,23 @@ void Editor::process_event(const SDL_Event& event)
 								for(; text[col][row] != ' ' &&
 									  row < text[col].size();)
 								{
-									text[col].erase(text[col].begin() + row);
+									this->text[col].erase(text[col].begin() + row);
 								}
 								if(text[col][row] == ' ')
 								{
-									text[col].erase(text[col].begin() + row);
+									this->text[col].erase(text[col].begin() + row);
 								}
-								changed = true;
+								this->changed = true;
+							}
+						}
+						break;
+						case SDLK_i:
+						{
+							if(keys[SDL_SCANCODE_LCTRL])
+							{
+								this->text.insert(text.begin() + ++col, "");
+								this->row = 0;
+								this->changed = true;
 							}
 						}
 						break;
