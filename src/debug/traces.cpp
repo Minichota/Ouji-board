@@ -9,6 +9,8 @@ static std::string path = "";
 static int selected_trace = 0;
 static int prev_trace = 0;
 
+static bool moving = false;
+
 std::vector<std::variant<Trace<float>*, Trace<int>*>> traces = {};
 std::vector<std::variant<Trace<float>*, Trace<int>*>> rendered_traces = {};
 std::vector<std::string> rendered_strings = {};
@@ -81,6 +83,8 @@ void render_traces()
 				rendered_strings.push_back(repr);
 			}
 		}
+		SDL_Rect anchor_rect = { trace_win_pos.x, trace_win_pos.y, 8, 8 };
+		SDL_RenderDrawRect(SDL::renderer, &anchor_rect);
 	}
 }
 
@@ -114,6 +118,24 @@ bool handle_trace_event(const SDL_Event& event)
 		{
 			switch(event.type)
 			{
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					SDL_Rect anchor_rect = { trace_win_pos.x, trace_win_pos.y, 8, 8 };
+					SDL_Point mouse_click = { event.button.x, event.button.y };
+					moving = SDL_PointInRect(&mouse_click, &anchor_rect);
+				}
+				break;
+				case SDL_MOUSEBUTTONUP:
+				{
+					moving = false;
+				}
+				break;
+				case SDL_MOUSEMOTION:
+				{
+					if(moving)
+						trace_win_pos += Ivec(event.motion.xrel, event.motion.yrel);
+				}
+				break;
 				case SDL_KEYDOWN:
 				{
 					switch(event.key.keysym.sym)

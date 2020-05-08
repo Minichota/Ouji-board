@@ -47,6 +47,7 @@ static bool process_events()
 		}
 		handle_events(event);
 
+		handle_temp_event(event);
 		if(!handle_trace_event(event))
 		{
 			if(!instances.empty())
@@ -132,6 +133,7 @@ int main()
 		SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
 		push_temp("mouse x: " + std::to_string(mouse_pos.x));
 		push_temp("mouse y: " + std::to_string(mouse_pos.y));
+		push_temp("instance: " + std::to_string(current_instance));
 		/* render */
 		Animation::global_render();
 		SDL_RenderPresent(renderer);

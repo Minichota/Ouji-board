@@ -12,3 +12,5 @@ struct Temp
 void render_temps();
 
 void push_temp(std::string temp);
+
+void handle_temp_event(const SDL_Event& event);
