@@ -229,15 +229,15 @@ bool handle_trace_event(const SDL_Event& event)
 	return Instance::state == DEBUG;
 }
 
-void remove_trace(void* address)
+void remove_trace(void* owner)
 {
-	// removes trace based off of address supplied.
+	// removes trace based off of owner supplied.
 	// used after object is destructed and shouldn't
 	// be used on permanent lifetime variables
 	for(size_t i = 0; i < traces.size(); i++)
 	{
-		std::visit([&i, address](auto&& arg) {
-			if(arg->address == address)
+		std::visit([&i, owner](auto&& arg) {
+			if(arg->owner == owner)
 			{
 				traces.erase(traces.begin() + i--);
 				SDL_DestroyTexture(arg->texture);

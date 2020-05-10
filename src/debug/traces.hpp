@@ -10,7 +10,7 @@
 template <class T>
 struct Trace
 {
-	void* address;
+	void* owner;
 	std::string path;
 	T* value;
 	SDL_Texture* texture = nullptr;
@@ -23,11 +23,11 @@ void render_traces();
 bool handle_trace_event(const SDL_Event& event);
 
 template <class T>
-void push_trace(void* address, std::string path, T* trace)
+void push_trace(void* owner, std::string path, T* trace)
 {
-	traces.push_back(new Trace<T>{address, path, trace});
+	traces.push_back(new Trace<T>{owner, path, trace});
 }
 
-void remove_trace(void* address);
+void remove_trace(void* owner);
 
 #endif
