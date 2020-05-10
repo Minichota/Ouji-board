@@ -4,15 +4,21 @@
 
 static Ivec trace_win_pos = {100,100};
 
-static std::string path = "";
+// represents the current window that is selected
+static std::string current_path = "";
 
+// used to update the values in the window
 static int selected_trace = 0;
 static int prev_trace = 0;
 
+// used for moving the entire debug window around
 static bool moving = false;
 
+// a storage of the traces
 std::vector<std::variant<Trace<float>*, Trace<int>*>> traces = {};
+// the currently being rendered traces
 std::vector<std::variant<Trace<float>*, Trace<int>*>> rendered_traces = {};
+// a storage of only the strings being rendered
 std::vector<std::string> rendered_strings = {};
 
 void render_traces()
@@ -26,15 +32,13 @@ void render_traces()
 		for(size_t i = 0; i < traces.size(); i++)
 		{
 			std::visit([&](auto&& arg) {
-				std::vector<std::string> path_split = Util::split_string(path, '/');
-				std::vector<std::string> trace_split = Util::split_string(arg->path, '/');
+				auto path_split  = Util::split_string(current_path, '/');
+				auto trace_split = Util::split_string(arg->path, '/');
 
 				for(size_t i = 0; i < path_split.size(); i++)
 				{
 					if(trace_split[i] != path_split[i])
-					{
 						return;
-					}
 				}
 				rendered_traces.push_back(arg);
 
@@ -49,33 +53,36 @@ void render_traces()
 			SDL_Texture* render_texture;
 			std::string repr = "";
 			std::visit([&](auto&& arg) {
+				// remove old texture
 				if(arg->texture != nullptr)
 					SDL_DestroyTexture(arg->texture);
-				std::vector<std::string> path_split  = Util::split_string(path, '/');
-				std::vector<std::string> trace_split = Util::split_string(arg->path, '/');
+				// extract string
+				auto path_split  = Util::split_string(current_path, '/');
+				auto trace_split = Util::split_string(arg->path, '/');
 				repr.append(trace_split[path_split.size()]);
 
-				// only add to this if it's not a directory //
+				// only append value to this if it's not a directory //
 
+				/* checks if it's a directory by checking how
+				   many more splits are left in the path */
 				if(trace_split.size() - 1 == path_split.size())
 				{
 					repr.append(": "+std::to_string(*arg->value));
-					// remove extra precision from floats
+
+					// remove extra decimals from floats
 					using T = std::decay_t<decltype(arg)>;
 					if constexpr (std::is_same_v<T, Trace<float>*>)
-					{
-						for(int i = 0; i < 4; i++)
-						{
-							repr.pop_back();
-						}
-					}
+						repr.erase(repr.end() - 4, repr.end());
 				}
+				// recreate texture
 				arg->texture = Resources::create_text(repr, Resources::MONO, draw_color);
 				render_texture = arg->texture;
 			}, rendered_traces[i]);
 
-			if(std::find(rendered_strings.begin(), rendered_strings.end(), repr) == rendered_strings.end() ||
-			   std::find(repr.begin(), repr.end(), ':') != repr.end())
+			/* check if it's in the rendered strings already
+			   when it's a directory to avoid duplicates */
+			if(std::find(rendered_strings.begin(), rendered_strings.end(), repr) == rendered_strings.end()
+			|| std::find(repr.begin(), repr.end(), ':') != repr.end())
 			{
 				SDL_Rect rect = { trace_win_pos.x, trace_win_pos.y + (int)rendered_strings.size() * 20 };
 				SDL_QueryTexture(render_texture, nullptr, nullptr, &rect.w, &rect.h);
@@ -83,6 +90,7 @@ void render_traces()
 				rendered_strings.push_back(repr);
 			}
 		}
+		// render move box
 		SDL_Rect anchor_rect = { trace_win_pos.x, trace_win_pos.y, 8, 8 };
 		SDL_RenderDrawRect(SDL::renderer, &anchor_rect);
 	}
@@ -143,11 +151,11 @@ bool handle_trace_event(const SDL_Event& event)
 						case SDLK_RETURN:
 						{
 							std::string selected_string = rendered_strings[selected_trace];
-							// change path if it's a directory
+							// change current_path if it's a directory
 							if(std::find(selected_string.begin(),
 										 selected_string.end(), ':') == selected_string.end())
 							{
-								path.append("/" + rendered_strings[selected_trace]);
+								current_path.append("/" + rendered_strings[selected_trace]);
 								selected_trace = 0;
 							}
 						}
@@ -180,7 +188,7 @@ bool handle_trace_event(const SDL_Event& event)
 						case SDLK_h:
 						{
 							// pop back directory
-							path = path.substr(0, path.find_last_of("\\/"));
+							current_path = current_path.substr(0, current_path.find_last_of("\\/"));
 							selected_trace = 0;
 						}
 						break;
@@ -197,8 +205,9 @@ bool handle_trace_event(const SDL_Event& event)
 						{
 							// push the number
 							std::visit([event](auto&& arg) {
-								int path_counts  = Util::split_string(path, '/').size();
+								int path_counts  = Util::split_string(current_path, '/').size();
 								int trace_counts = Util::split_string(arg->path, '/').size();
+								// assure that it only takes place on values and not directories
 								if(trace_counts - 1 == path_counts)
 								{
 									std::string value = std::to_string(*arg->value);
