@@ -3,6 +3,7 @@
 #include "instance.hpp"
 #include "system.hpp"
 #include "traces.hpp"
+#include "instance-view.hpp"
 
 State Instance::state = NORMAL;
 Instance::Instance(Ivec pos, Ivec size, short border_size,
@@ -21,6 +22,7 @@ Instance::Instance(Ivec pos, Ivec size, short border_size,
 	push_trace(this, "/instances/positions/pos_y", &this->pos.y);
 	push_trace(this, "/instances/sizes/size_x", &this->size.x);
 	push_trace(this, "/instances/sizes/size_y", &this->size.y);
+	push_view(this);
 }
 
 Instance::~Instance()
@@ -29,6 +31,7 @@ Instance::~Instance()
 	this->thread.join();
 	SDL_DestroyTexture(render_texture);
 	remove_trace(this);
+	pop_view(this);
 }
 
 void Instance::thread_update()
@@ -70,4 +73,12 @@ bool Instance::collides(Ivec m_pos)
 {
 	return m_pos.x > pos.x && m_pos.x < pos.x + size.x && m_pos.y > pos.y &&
 		   m_pos.y < pos.y + size.y;
+}
+
+std::vector<std::string> Instance::serialize()
+{
+	return {
+		std::to_string(pos.x) + " " + std::to_string(pos.y),
+		std::to_string(size.x) + " " + std::to_string(size.y),
+	};
 }

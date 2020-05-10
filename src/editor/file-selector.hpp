@@ -15,6 +15,8 @@ class FileSelector : public Instance
 
 	void handle_resize() override;
 
+	std::vector<std::string> serialize() override;
+
 	private:
 	dirent** dirents;
 	std::string current_path;

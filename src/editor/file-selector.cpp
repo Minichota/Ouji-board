@@ -197,3 +197,13 @@ void FileSelector::handle_resize()
 {
 	this->changed = true;
 }
+
+std::vector<std::string> FileSelector::serialize()
+{
+	return {
+		std::to_string(pos.x)  + " " + std::to_string(pos.y),
+		std::to_string(size.x) + " " + std::to_string(size.y),
+		current_path,
+		std::to_string(sel_file)
+	};
+}

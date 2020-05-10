@@ -20,13 +20,16 @@ void handle_events(const SDL_Event& event)
 	{
 		case SDL_MOUSEBUTTONDOWN:
 		{
-			for(size_t i = 0; i < instances.size(); i++)
+			if(Instance::state == NORMAL)
 			{
-				if(instances[i]->collides(Ivec(event.motion.x, event.motion.y)))
+				for(size_t i = 0; i < instances.size(); i++)
 				{
-					instances[current_instance]->active = false;
-					current_instance = i;
-					instances[current_instance]->active = true;
+					if(instances[i]->collides(Ivec(event.motion.x, event.motion.y)))
+					{
+						instances[current_instance]->active = false;
+						current_instance = i;
+						instances[current_instance]->active = true;
+					}
 				}
 			}
 		}

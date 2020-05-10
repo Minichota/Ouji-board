@@ -23,6 +23,8 @@ std::vector<std::string> rendered_strings = {};
 
 void render_traces()
 {
+	constexpr int OUTLINE_OFFSET = 2;
+	SDL_Rect outline_rect = { trace_win_pos.x - OUTLINE_OFFSET, trace_win_pos.y - OUTLINE_OFFSET, 0, OUTLINE_OFFSET };
 	if(Instance::state == DEBUG)
 	{
 		rendered_strings.clear();
@@ -88,11 +90,17 @@ void render_traces()
 				SDL_QueryTexture(render_texture, nullptr, nullptr, &rect.w, &rect.h);
 				SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &rect);
 				rendered_strings.push_back(repr);
+				outline_rect.w = std::max(outline_rect.w, rect.w);
+				outline_rect.h += 20;
 			}
 		}
 		// render move box
 		SDL_Rect anchor_rect = { trace_win_pos.x, trace_win_pos.y, 8, 8 };
 		SDL_RenderDrawRect(SDL::renderer, &anchor_rect);
+
+		// render outline
+		outline_rect.w += OUTLINE_OFFSET * 2;
+		SDL_RenderDrawRect(SDL::renderer, &outline_rect);
 	}
 }
 

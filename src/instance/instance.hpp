@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <thread>
+#include <vector>
 
 #include "vectors.hpp"
 
@@ -26,6 +27,8 @@ class Instance
 	virtual void process_event(const SDL_Event& event);
 
 	virtual void handle_resize() = 0;
+
+	virtual std::vector<std::string> serialize();
 
 	bool collides(Ivec m_pos);
 

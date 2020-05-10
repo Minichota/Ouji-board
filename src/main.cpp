@@ -12,6 +12,7 @@
 #include "vectors.hpp"
 #include "temp.hpp"
 #include "traces.hpp"
+#include "instance-view.hpp"
 
 using namespace SDL;
 using namespace Resources;
@@ -48,6 +49,7 @@ static bool process_events()
 		handle_events(event);
 
 		handle_temp_event(event);
+		handle_view_event(event);
 		if(!handle_trace_event(event))
 		{
 			if(!instances.empty())
@@ -111,6 +113,7 @@ int main()
 
 		render_traces();
 		render_temps();
+		render_views();
 
 		/* rendering of current_state to corner of screen */
 		SDL_Texture* texture = nullptr;
