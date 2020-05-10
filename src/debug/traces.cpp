@@ -23,8 +23,13 @@ std::vector<std::string> rendered_strings = {};
 
 void render_traces()
 {
+	static size_t title_cache = Resources::cache_text(Resources::create_text("TRACES", Resources::MONO, SDL_Color{255,255,255,255}));
+	static size_t star_cache  = Resources::cache_text(Resources::create_text("*", Resources::MONO, SDL_Color{0,255,255,255}));
+	SDL_Rect title_rect = { trace_win_pos.x, trace_win_pos.y };
+	SDL_QueryTexture(Resources::load_cache_text(title_cache), nullptr, nullptr, &title_rect.w, &title_rect.h);
+
 	constexpr int OUTLINE_OFFSET = 2;
-	SDL_Rect outline_rect = { trace_win_pos.x - OUTLINE_OFFSET, trace_win_pos.y - OUTLINE_OFFSET, 0, OUTLINE_OFFSET };
+	SDL_Rect outline_rect = { trace_win_pos.x - OUTLINE_OFFSET, trace_win_pos.y - OUTLINE_OFFSET, 0, title_rect.h };
 	if(Instance::state == DEBUG)
 	{
 		rendered_strings.clear();
@@ -48,9 +53,7 @@ void render_traces()
 		}
 		for(size_t i = 0; i < rendered_traces.size(); i++)
 		{
-			SDL_Color draw_color = (int)rendered_strings.size() == selected_trace ?
-			SDL_Color { 255,255,255,255 } :
-			SDL_Color { 255,255,255,100 };
+			SDL_Color draw_color = { 255, 0, 0, 255 };
 
 			SDL_Texture* render_texture;
 			std::string repr = "";
@@ -86,12 +89,19 @@ void render_traces()
 			if(std::find(rendered_strings.begin(), rendered_strings.end(), repr) == rendered_strings.end()
 			|| std::find(repr.begin(), repr.end(), ':') != repr.end())
 			{
-				SDL_Rect rect = { trace_win_pos.x, trace_win_pos.y + (int)rendered_strings.size() * 20 };
+				SDL_Rect rect = { trace_win_pos.x, trace_win_pos.y + (int)rendered_strings.size() * 20 + title_rect.h };
 				SDL_QueryTexture(render_texture, nullptr, nullptr, &rect.w, &rect.h);
 				SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &rect);
-				rendered_strings.push_back(repr);
 				outline_rect.w = std::max(outline_rect.w, rect.w);
 				outline_rect.h += 20;
+				if((int)selected_trace == (int)rendered_strings.size())
+				{
+					// render star
+					SDL_Rect star_rect = { rect.x - 20, rect.y };
+					SDL_QueryTexture(Resources::load_cache_text(star_cache), nullptr, nullptr, &star_rect.w, &star_rect.h);
+					SDL_RenderCopy(SDL::renderer, Resources::load_cache_text(star_cache), nullptr, &star_rect);
+				}
+				rendered_strings.push_back(repr);
 			}
 		}
 		// render move box
@@ -100,7 +110,11 @@ void render_traces()
 
 		// render outline
 		outline_rect.w += OUTLINE_OFFSET * 2;
+		outline_rect.h += OUTLINE_OFFSET * 2;
 		SDL_RenderDrawRect(SDL::renderer, &outline_rect);
+
+		// render title
+		SDL_RenderCopy(SDL::renderer, Resources::load_cache_text(title_cache), nullptr, &title_rect);
 	}
 }
 

@@ -10,6 +10,7 @@ static Ivec view_pos = { 500, 500 };
 static size_t selected_view = 0;
 static bool moving = false;
 
+
 void push_view(Instance* view)
 {
 	views.push_back(view);
@@ -31,30 +32,34 @@ void pop_view(Instance* view)
 
 void render_views()
 {
+	static size_t title_cache = Resources::cache_text(Resources::create_text("INSTANCES", Resources::MONO, SDL_Color{255,255,255,255}));
+	static size_t star_cache  = Resources::cache_text(Resources::create_text("*", Resources::MONO, SDL_Color{ 0, 255, 255, 255 }));
+	SDL_Rect title_rect = { view_pos.x, view_pos.y };
+	SDL_QueryTexture(Resources::load_cache_text(title_cache), nullptr, nullptr, &title_rect.w, &title_rect.h);
+	SDL_RenderCopy(SDL::renderer, Resources::load_cache_text(title_cache), nullptr, &title_rect);
+
 	constexpr int OUTLINE_OFFSET = 2;
-	SDL_Rect outline_rect = { view_pos.x - OUTLINE_OFFSET, view_pos.y - OUTLINE_OFFSET, 0, OUTLINE_OFFSET };
+	SDL_Rect outline_rect = { view_pos.x - OUTLINE_OFFSET, view_pos.y - OUTLINE_OFFSET, 0, title_rect.h };
 	// render list of instances
 	for(size_t i = 0; i < views.size(); i++)
 	{
 		SDL_Texture* render_texture = Resources::create_text("at x pos: " + std::to_string(views[i]->get_pos().x),
 									  Resources::MONO, SDL_Color{ 255, 0, 0, 255});
-		SDL_Rect render_rect = { view_pos.x, view_pos.y + (int)i * 20 };
+		SDL_Rect render_rect = { view_pos.x, view_pos.y + (int)i * 20 + title_rect.h };
 		SDL_QueryTexture(render_texture, nullptr, nullptr, &render_rect.w, &render_rect.h);
 		SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &render_rect);
 		SDL_DestroyTexture(render_texture);
 		if(i == selected_view)
 		{
-			SDL_Texture* arrow_texture = Resources::create_text("*", Resources::MONO, SDL_Color{ 0, 255, 255, 255 });
-			SDL_Rect arrow_rect = { render_rect.x - 20, render_rect.y };
-			SDL_QueryTexture(arrow_texture, nullptr, nullptr, &arrow_rect.w, &arrow_rect.h);
-			SDL_RenderCopy(SDL::renderer, arrow_texture, nullptr, &arrow_rect);
-			SDL_DestroyTexture(arrow_texture);
+			SDL_Rect star_rect = { render_rect.x - 20, render_rect.y };
+			SDL_QueryTexture(Resources::load_cache_text(star_cache), nullptr, nullptr, &star_rect.w, &star_rect.h);
+			SDL_RenderCopy(SDL::renderer, Resources::load_cache_text(star_cache), nullptr, &star_rect);
 		}
 		outline_rect.h += 20;
 	}
 
 	int views_height = outline_rect.h;
-	outline_rect.h = OUTLINE_OFFSET;
+	outline_rect.h = OUTLINE_OFFSET + title_rect.h;
 
 	// render serialized instance
 	if(views.size() > 0)
@@ -64,7 +69,7 @@ void render_views()
 		{
 			SDL_Texture* render_texture = Resources::create_text(render_texts[i],
 										  Resources::MONO, SDL_Color{ 255, 0, 0, 255});
-			SDL_Rect render_rect = { view_pos.x + 200, view_pos.y + (int)i * 20 };
+			SDL_Rect render_rect = { view_pos.x + 200, view_pos.y + (int)i * 20 + title_rect.h };
 			SDL_QueryTexture(render_texture, nullptr, nullptr, &render_rect.w, &render_rect.h);
 			SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &render_rect);
 			SDL_DestroyTexture(render_texture);
