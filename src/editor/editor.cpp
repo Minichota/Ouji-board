@@ -8,7 +8,7 @@
 #define GROUPING_COUNT 4
 const std::vector<std::string> Editor::groupings =
 {
-	"\"!@#$%^&*',;",
+	"\"!@#$%^&*',;.",
 	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
 	"(){}[]<>",
 	" "
