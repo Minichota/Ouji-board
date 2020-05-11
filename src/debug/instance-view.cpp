@@ -32,6 +32,7 @@ void pop_view(Instance* view)
 
 void render_views()
 {
+	SDL_SetRenderDrawColor(SDL::renderer, 255, 255, 255, 255);
 	static size_t title_cache = Resources::cache_text(Resources::create_text("INSTANCES", Resources::MONO, SDL_Color{255,255,255,255}));
 	static size_t star_cache  = Resources::cache_text(Resources::create_text("*", Resources::MONO, SDL_Color{ 0, 255, 255, 255 }));
 	SDL_Rect title_rect = { view_pos.x, view_pos.y };
@@ -44,7 +45,7 @@ void render_views()
 	for(size_t i = 0; i < views.size(); i++)
 	{
 		SDL_Texture* render_texture = Resources::create_text("at x pos: " + std::to_string(views[i]->get_pos().x),
-									  Resources::MONO, SDL_Color{ 255, 0, 0, 255});
+									  Resources::MONO, SDL_Color{ 255, 0, 0, 255 });
 		SDL_Rect render_rect = { view_pos.x, view_pos.y + (int)i * 20 + title_rect.h };
 		SDL_QueryTexture(render_texture, nullptr, nullptr, &render_rect.w, &render_rect.h);
 		SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &render_rect);
@@ -68,7 +69,7 @@ void render_views()
 		for(size_t i = 0; i < render_texts.size(); i++)
 		{
 			SDL_Texture* render_texture = Resources::create_text(render_texts[i],
-										  Resources::MONO, SDL_Color{ 255, 0, 0, 255});
+										  Resources::MONO, SDL_Color{ 255, 0, 0, 255 });
 			SDL_Rect render_rect = { view_pos.x + 200, view_pos.y + (int)i * 20 + title_rect.h };
 			SDL_QueryTexture(render_texture, nullptr, nullptr, &render_rect.w, &render_rect.h);
 			SDL_RenderCopy(SDL::renderer, render_texture, nullptr, &render_rect);

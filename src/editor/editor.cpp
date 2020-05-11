@@ -624,3 +624,13 @@ void Editor::save(std::string path)
 		ofstream.close();
 	}
 }
+
+std::vector<std::string> Editor::serialize()
+{
+	return {
+		std::to_string(pos.x) + " " + std::to_string(pos.y),
+		std::to_string(size.x) + " " + std::to_string(size.y),
+		curr_file,
+		"lc: " + std::to_string(text.size())
+	};
+}

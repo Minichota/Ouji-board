@@ -23,6 +23,8 @@ class Editor : public Instance
 	void read(std::string path);
 	void save(std::string path);
 
+	std::vector<std::string> serialize() override;
+
 	private:
 	const static std::vector<std::string> groupings;
 	std::string curr_file;

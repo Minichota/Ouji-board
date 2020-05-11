@@ -8,6 +8,7 @@ static bool moving = false;
 
 void render_temps()
 {
+	SDL_SetRenderDrawColor(SDL::renderer, 255, 255, 255, 255);
 	SDL_Rect rect;
 	if(Instance::state == DEBUG)
 	{

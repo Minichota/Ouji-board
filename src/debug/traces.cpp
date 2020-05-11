@@ -23,6 +23,7 @@ std::vector<std::string> rendered_strings = {};
 
 void render_traces()
 {
+	SDL_SetRenderDrawColor(SDL::renderer, 255, 255, 255, 255);
 	static size_t title_cache = Resources::cache_text(Resources::create_text("TRACES", Resources::MONO, SDL_Color{255,255,255,255}));
 	static size_t star_cache  = Resources::cache_text(Resources::create_text("*", Resources::MONO, SDL_Color{0,255,255,255}));
 	SDL_Rect title_rect = { trace_win_pos.x, trace_win_pos.y };
