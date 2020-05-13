@@ -18,9 +18,9 @@ struct Trace
 
 extern std::vector<std::variant<Trace<float>*, Trace<int>*>> traces;
 
-void render_traces();
+SDL_Rect render_traces(Ivec window_pos);
 
-bool handle_trace_event(const SDL_Event& event);
+void handle_trace_event(const SDL_Event& event);
 
 template <class T>
 void push_trace(void* owner, std::string path, T* trace)

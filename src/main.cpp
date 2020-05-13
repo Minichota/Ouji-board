@@ -13,9 +13,12 @@
 #include "temp.hpp"
 #include "traces.hpp"
 #include "instance-view.hpp"
+#include "debug-manager.hpp"
 
 using namespace SDL;
 using namespace Resources;
+
+static DebugManager debug = DebugManager();
 
 static bool process_events()
 {
@@ -47,10 +50,9 @@ static bool process_events()
 			break;
 		}
 		handle_events(event);
+		debug.handle_event(event);
 
-		handle_temp_event(event);
-		handle_view_event(event);
-		if(!handle_trace_event(event))
+		if(Instance::state != DEBUG)
 		{
 			if(!instances.empty())
 				instances[current_instance]->process_event(event);
@@ -111,9 +113,7 @@ int main()
 			instances[i]->render();
 		}
 
-		render_traces();
-		render_temps();
-		render_views();
+		debug.render();
 
 		/* rendering of current_state to corner of screen */
 		SDL_Texture* texture = nullptr;
