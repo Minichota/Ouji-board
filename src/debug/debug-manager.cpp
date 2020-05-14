@@ -6,7 +6,7 @@
 
 DebugManager::DebugManager() :
 visible { false, false, false },
-debug_positions { Ivec(100,100), Ivec(250,100), Ivec(400,100) }
+debug_positions { Ivec(100,100), Ivec(250,100), Ivec(400,100), Ivec(550,100) }
 {
 	this->active = TRACE;
 	this->moving = SELECTION_COUNT;
@@ -37,6 +37,12 @@ void DebugManager::render()
 		else
 			SDL_SetRenderDrawColor(SDL::renderer, active == VIEW ? 0 : 255, 255, 255, 255);
 		debug_sizes[VIEW] = render_views(debug_positions[VIEW]);
+
+		if(visible[LOG])
+			SDL_SetRenderDrawColor(SDL::renderer, 0, 255, 0, 255);
+		else
+			SDL_SetRenderDrawColor(SDL::renderer, active == LOG ? 0 : 255, 255, 255, 255);
+		debug_sizes[LOG] = render_logs(debug_positions[LOG]);
 	}
 	else
 	{
@@ -44,6 +50,7 @@ void DebugManager::render()
 		if(visible[TRACE]) render_traces(debug_positions[TRACE]);
 		if(visible[TEMP])   render_temps(debug_positions[TEMP]);
 		if(visible[VIEW])   render_views(debug_positions[VIEW]);
+		if(visible[LOG])   render_logs(debug_positions[LOG]);
 	}
 }
 
@@ -94,6 +101,11 @@ void DebugManager::handle_event(const SDL_Event& event)
 					active = VIEW;
 				}
 				break;
+				case SDLK_KP_4:
+				{
+					active = LOG;
+				}
+				break;
 				case SDLK_d:
 				{
 					if(Instance::state == COMMAND)
@@ -108,17 +120,22 @@ void DebugManager::handle_event(const SDL_Event& event)
 						{
 							case TRACE:
 							{
-								visible[0] = !visible[0];
+								visible[TRACE] = !visible[TRACE];
 							}
 							break;
 							case TEMP:
 							{
-								visible[1] = !visible[1];
+								visible[TEMP] = !visible[TEMP];
 							}
 							break;
 							case VIEW:
 							{
-								visible[2] = !visible[2];
+								visible[VIEW] = !visible[VIEW];
+							}
+							break;
+							case LOG:
+							{
+								visible[LOG] = !visible[LOG];
 							}
 							break;
 							case SELECTION_COUNT:
@@ -147,6 +164,7 @@ void DebugManager::handle_event(const SDL_Event& event)
 			handle_view_event(event);
 		}
 		break;
+		case LOG:
 		case SELECTION_COUNT:
 		break;
 	}

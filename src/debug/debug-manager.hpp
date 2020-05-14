@@ -1,12 +1,14 @@
 #include "traces.hpp"
 #include "temp.hpp"
 #include "instance-view.hpp"
+#include "log.hpp"
 
 enum Selection
 {
 	TRACE = 0,
 	TEMP,
 	VIEW,
+	LOG,
 	SELECTION_COUNT
 };
 

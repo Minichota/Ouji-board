@@ -28,37 +28,21 @@ SDL_Rect render_temps(Ivec window_pos)
 	border_rect.w += 2 * BORDER_OFFSET;
 	border_rect.h += 2 * BORDER_OFFSET;
 	SDL_RenderDrawRect(SDL::renderer, &border_rect);
-	current_id = 0;
+	for(Temp temp : temporaries)
+	{
+		SDL_DestroyTexture(temp.texture);
+	}
+	temporaries.clear();
 	return border_rect;
 }
 
 void push_temp(std::string temp)
 {
-	if(Instance::state == DEBUG)
-	{
-		if(current_id < (int)temporaries.size())
-		{
-			if(temporaries[current_id].text != temp)
-			{
-				SDL_DestroyTexture(temporaries[current_id].texture);
-				temporaries.erase(temporaries.begin() + current_id);
-				temporaries.insert(temporaries.begin() + current_id,
-					Temp {
-						current_id, temp,
-						Resources::create_text(temp, Resources::MONO, SDL_Color{255,0,0,255})
-					});
-			}
-		}
-		else
-		{
-			temporaries.push_back(
-				Temp {
-					current_id, temp,
-					Resources::create_text(temp, Resources::MONO, SDL_Color{255,0,0,255})
-				});
-		}
-		current_id++;
-	}
+	temporaries.push_back(
+		Temp {
+			current_id, temp,
+			Resources::create_text(temp, Resources::MONO, SDL_Color{255,0,0,255})
+		});
 }
 
 void handle_temp_event(const SDL_Event& event)

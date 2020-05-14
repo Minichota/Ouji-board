@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "system.hpp"
+#include "log.hpp"
 
 std::vector<Instance*> instances;
 size_t current_instance = 0;
@@ -82,6 +83,7 @@ std::vector<SDL_Texture*> text_cache;
 
 size_t cache_text(SDL_Texture* text)
 {
+	push_log("created cache");
 	text_cache.push_back(text);
 	return text_cache.size() - 1;
 }
@@ -127,6 +129,7 @@ void load_res(int font_size)
 		}
 		fonts.push_back(font);
 	}
+	push_log("loaded resources");
 }
 void clear_res()
 {
@@ -150,7 +153,6 @@ namespace Util
 std::vector<std::string> split_string(const std::string& str,
 									  const char delimiter)
 {
-	// TODO fix hacky solution
 	std::vector<std::string> strings;
 
 	std::string::size_type pos = 0;
